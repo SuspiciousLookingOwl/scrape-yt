@@ -1,0 +1,28 @@
+{
+  "name": "scrape-yt",
+  "version": "1.0.0",
+  "description": "Simple package to scrape information from youtube such as search results, video information, related videos, and up next video",
+  "main": "index.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VincentJonathan/yt-scrape.git"
+  },
+  "keywords": [
+    "youtube",
+    "scrape"
+  ],
+  "author": "Vincent Jonathan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VincentJonathan/yt-scrape/issues"
+  },
+  "homepage": "https://github.com/VincentJonathan/yt-scrape#readme"
+}
