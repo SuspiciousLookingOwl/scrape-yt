@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VincentJonathan/yt-scrape.git"
+    "url": "git+https://github.com/VincentJonathan/scrape-yt.git"
   },
   "keywords": [
     "youtube",
@@ -22,7 +22,7 @@
   "author": "Vincent Jonathan",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/VincentJonathan/yt-scrape/issues"
+    "url": "https://github.com/VincentJonathan/scrape-yt/issues"
   },
-  "homepage": "https://github.com/VincentJonathan/yt-scrape#readme"
+  "homepage": "https://github.com/VincentJonathan/scrape-yt#readme"
 }

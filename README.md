@@ -1,5 +1,5 @@
 # scrape-yt
-Simple package to scrape information from youtube such as search results, video information, related videos, and up next video
+Simple package to scrape information from Youtube such as search results, video information, related videos, and up next video
 
 ## Installation
 ```bash
