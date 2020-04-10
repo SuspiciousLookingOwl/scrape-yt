@@ -17,11 +17,18 @@ await scrapeYoutube.search("Never gonna give you up", 5);
 //Get video information of video id "dQw4w9WgXcQ"
 await scrapeYoutube.getUpNext("dQw4w9WgXcQ");
 
+
+// -- Or use promises --
+
 //Searches for videos related to video id "dQw4w9WgXcQ" with limit of 10 (default) videos
-await scrapeYoutube.getRelated("dQw4w9WgXcQ");
+scrapeYoutube.getRelated("dQw4w9WgXcQ").then(videos => {
+    console.log(videos);
+});
 
 //Searches for up next video of video id "dQw4w9WgXcQ"
-await scrapeYoutube.getUpNext("dQw4w9WgXcQ");
+scrapeYoutube.getUpNext("dQw4w9WgXcQ").then(video => {
+    console.log(video)
+});
 ```
 
 ## Results
@@ -79,7 +86,7 @@ Result example from `getVideo()`
 ```
 
 **Note**:
-* `duration` is on second
+* `duration` is in second
 * `uploadDate` language is based on  the default language the youtube set for you 
 
 
