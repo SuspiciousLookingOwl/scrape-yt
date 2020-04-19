@@ -56,13 +56,13 @@ const parseSearch = (url, options) => {
 
 				const result = {
 					id: id,
-					channel: {
-						url: "https://www.youtube.com" + $video.find(".yt-lockup-byline a").attr("href") || null,
-						name: $video.find(".yt-lockup-byline a").text() || null,
-					},
 					title: $video.find(".yt-lockup-title a").text(),
 					duration: getDuration($video.find(".video-time").text().trim()) || null,
 					thumbnail: $video.find(".yt-thumb-simple img").attr("data-thumb") || $video.find(".yt-thumb-simple img").attr("src"),
+					channel: {
+						name: $video.find(".yt-lockup-byline a").text() || null,
+						url: "https://www.youtube.com" + $video.find(".yt-lockup-byline a").attr("href") || null,
+					},
 					uploadDate: uploadDate,
 					viewCount: viewCount,
 					videoCount: videoCount
@@ -82,7 +82,7 @@ const parseSearch = (url, options) => {
 };
 
 
-const parseGetPlaylistVideo = (url) => {
+const parseGetPlaylist = (url) => {
 	return new Promise((resolve, reject) => {
 		request({
 			method: "GET",
@@ -92,26 +92,41 @@ const parseGetPlaylistVideo = (url) => {
 			if (err != null || res.statusCode != 200) return reject("Failed to search videos");
 
 			const $ = cheerio.load(body);
-			let results = [];
+			let videos = [];
 
 			$(".pl-video").each((i, v) => {
 				const $video = $(v);
 				
-				const result = {
+				const video = {
 					id: $video.find("button").attr("data-video-ids"),
-					channel: {
-						url: "https://www.youtube.com" + $video.find(".pl-video-owner a").attr("href"),
-						name: $video.find(".pl-video-owner a").text()
-					},
 					title: $video.find("a.pl-video-title-link").text().replace(/\n/g,"").trim(),
 					duration: getDuration($video.find(".timestamp").text()) || null,
-					thumbnail: $video.find("img").attr("data-thumb")
+					thumbnail: $video.find("img").attr("data-thumb"),
+					channel: {
+						name: $video.find(".pl-video-owner a").text(),
+						url: "https://www.youtube.com" + $video.find(".pl-video-owner a").attr("href")
+					}
 				};
 
-				if(result.duration === null) return true; //Continue of deleted video
-				results.push(result);
+				if(video.duration === null) return true; //Continue of deleted video
+				videos.push(video);
 			});
-			resolve(results);
+
+			const playlist = {
+				id: $("#pl-header").attr("data-full-list-id"),
+				title: $(".pl-header-title").text().trim(),
+				videoCount: +$(".pl-header-details li")[1].children[0].data.replace(/[^0-9]/g, ""),
+				viewCount: +$(".pl-header-details li")[2].children[0].data.replace(/[^0-9]/g, ""),
+				lastUpdatedAt: $(".pl-header-details li")[3].children[0].data,
+				channel: {
+					name: $(".appbar-nav-avatar").attr("title"),
+					thumbnail: $(".appbar-nav-avatar").attr("src"),
+					url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
+				},
+				videos: videos
+			};
+
+			resolve(playlist);
 
 		});
 	});
@@ -145,13 +160,13 @@ const parseGetVideo = (url) => {
 
 			const video = {
 				id: videoInfo.videoId,
+				title: videoInfo.title.runs[0].text,
+				description: description,
 				channel: {
 					id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
 					name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
 					thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url
 				},
-				title: videoInfo.title.runs[0].text,
-				description: description,
 				uploadDate: videoInfo.dateText.simpleText,
 				viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
 				likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount,
@@ -187,13 +202,13 @@ const parseGetRelated = (url, limit) => {
 
 				const video = {
 					id: videoInfo.videoId,
+					title: videoInfo.title.simpleText,
+					duration: getDuration(videoInfo.lengthText.simpleText),
+					thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 					channel: {
 						id: videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 						name: videoInfo.longBylineText.runs[0].text
 					},
-					title: videoInfo.title.simpleText,
-					duration: getDuration(videoInfo.lengthText.simpleText),
-					thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 					uploadDate: videoInfo.publishedTimeText.simpleText,
 					viewCount: +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, ""),
 				};
@@ -269,14 +284,14 @@ module.exports = {
 	},
 
 	/**
-	 * Search youtube for videos in a playlist.
+	 * Search youtube for playlist information.
 	 * @param videoId Id of the video
 	 */
-	getPlaylistVideo: (playlistId) => {
+	getPlaylist: (playlistId) => {
 		return new Promise((resolve, reject) => {
 			let playlistUrl = url + "playlist?";
 			if (playlistId.trim().length === 0) return reject(new Error("Playlist ID cannot be blank"));
-			resolve(parseGetPlaylistVideo(playlistUrl + "list=" + playlistId));
+			resolve(parseGetPlaylist(playlistUrl + "list=" + playlistId));
 		});
 	},
 
