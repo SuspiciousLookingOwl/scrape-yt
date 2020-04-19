@@ -1,6 +1,7 @@
 
 # scrape-yt
 ![npm](https://nodei.co/npm/scrape-yt.png?downloads=true)
+
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
 ## Installation
@@ -40,7 +41,7 @@ Result example (video):
         "uploadDate": "10 tahun yang lalu",
         "viewCount": 679582223
     },
-	...
+    ...
 ]
 ```
 Result example (playlist):
