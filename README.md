@@ -1,6 +1,6 @@
 
 # scrape-yt
-![npm](https://nodei.co/npm/scrape-yt.png?downloads=true)
+[![NPM](https://nodei.co/npm/scrape-yt.png?downloads=true)](https://nodei.co/npm/scrape-yt)
 
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
