@@ -15,9 +15,17 @@ npm install scrape-yt
 const scrapeYoutube = require("scrape-yt");
 
 //Searches for video with keyword "Never gonna give you up" and limited to 5 videos
-await scrapeYoutube.search("Never gonna give you up" {
+await scrapeYoutube.search("Never gonna give you up", {
     type: "video"
 }); 
+
+//Or use promises
+scrapeYoutube.search("Never gonna give you up", {
+    type: "video"
+}).then(videos => {
+    console.log(videos);
+}); 
+
 ```
 
 ## API
