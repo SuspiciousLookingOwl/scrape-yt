@@ -3,8 +3,13 @@ const request = require("request");
 
 let url = "https://www.youtube.com/";
 
+const searchType = {
+	video: "EgIQAQ%253D%253D",
+	playlist: "EgIQAw%253D%253D"
+};
 
 const getDuration = (s) => {
+	s = s.replace(/:/, ".");
 	const spl = s.split(".");
 	if (spl.length === 0) return +spl;
 	else {
@@ -19,7 +24,7 @@ const getDuration = (s) => {
 };
 
 
-const parseSearch = (url, limit) => {
+const parseSearch = (url, options) => {
 	return new Promise((resolve, reject) => {
 		request({
 			method: "GET",
@@ -30,11 +35,27 @@ const parseSearch = (url, limit) => {
 
 			let results = [];
 			const $ = cheerio.load(body);
-
+			
 			$(".yt-lockup").each((i, v) => {
 				const $video = $(v);
+
+				let id = $video.find("a.yt-uix-tile-link").attr("href").replace("/watch?v=", "");
+				let uploadDate = null;
+				let viewCount = null;
+				let videoCount = null;
+	
+				if (options.type === "video") {
+					uploadDate = $video.find(".yt-lockup-meta-info li:first-of-type").text();
+					viewCount = +$video.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "");
+				}
+	
+				if (options.type === "playlist") {
+					id = id.split("&list=")[1];
+					videoCount = +$video.find(".formatted-video-count-label b").text();
+				}
+
 				const result = {
-					id: $video.find("a.yt-uix-tile-link").attr("href").replace("/watch?v=", ""),
+					id: id,
 					channel: {
 						url: "https://www.youtube.com" + $video.find(".yt-lockup-byline a").attr("href") || null,
 						name: $video.find(".yt-lockup-byline a").text() || null,
@@ -42,10 +63,53 @@ const parseSearch = (url, limit) => {
 					title: $video.find(".yt-lockup-title a").text(),
 					duration: getDuration($video.find(".video-time").text().trim()) || null,
 					thumbnail: $video.find(".yt-thumb-simple img").attr("data-thumb") || $video.find(".yt-thumb-simple img").attr("src"),
-					uploadDate: $video.find(".yt-lockup-meta-info li:first-of-type").text(),
-					viewCount: +$video.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "")
+					uploadDate: uploadDate,
+					viewCount: viewCount,
+					videoCount: videoCount
 				};
-				if (i < limit) results.push(result);
+
+				Object.keys(result).forEach((i) => {
+					if (result[i] === null) delete result[i];
+				});
+
+				if (i < options.limit) results.push(result);
+				else return false;
+			});
+			resolve(results);
+
+		});
+	});
+};
+
+
+const parseGetPlaylistVideo = (url) => {
+	return new Promise((resolve, reject) => {
+		request({
+			method: "GET",
+			url: url
+		}, (err, res, body) => {
+
+			if (err != null || res.statusCode != 200) return reject("Failed to search videos");
+
+			const $ = cheerio.load(body);
+			let results = [];
+
+			$(".pl-video").each((i, v) => {
+				const $video = $(v);
+				
+				const result = {
+					id: $video.find("button").attr("data-video-ids"),
+					channel: {
+						url: "https://www.youtube.com" + $video.find(".pl-video-owner a").attr("href"),
+						name: $video.find(".pl-video-owner a").text()
+					},
+					title: $video.find("a.pl-video-title-link").text().replace(/\n/g,"").trim(),
+					duration: getDuration($video.find(".timestamp").text()) || null,
+					thumbnail: $video.find("img").attr("data-thumb")
+				};
+
+				if(result.duration === null) return true; //Continue of deleted video
+				results.push(result);
 			});
 			resolve(results);
 
@@ -180,16 +244,38 @@ const parseGetUpNext = (url) => {
 
 module.exports = {
 	/**
-	 * Search youtube for a list of videos based on a search query.
+	 * Search youtube for a list of  based on a search query.
 	 * @param query Search Query
-	 * @param limit (optional) Max videos count
+	 * @param options (optional) Option for search type and limit
 	 */
-	search: (query, limit = 10) => {
+	search: (query, options) => {
 		return new Promise((resolve, reject) => {
+
+			if (typeof options === "undefined") options = {};
+
+			options = {
+				type: "video",
+				limit: 10,
+				...options
+			};
+
 			let searchUrl = url + "results?";
 			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
-			searchUrl += "sp=EgIQAQ%253D%253D&";
-			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), limit));
+			if (options.type && searchType[options.type]) searchUrl += "sp=" + searchType[options.type] + "&";
+
+			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), options));
+		});
+	},
+
+	/**
+	 * Search youtube for videos in a playlist.
+	 * @param videoId Id of the video
+	 */
+	getPlaylistVideo: (playlistId) => {
+		return new Promise((resolve, reject) => {
+			let playlistUrl = url + "playlist?";
+			if (playlistId.trim().length === 0) return reject(new Error("Playlist ID cannot be blank"));
+			resolve(parseGetPlaylistVideo(playlistUrl + "list=" + playlistId));
 		});
 	},
 
