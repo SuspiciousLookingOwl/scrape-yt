@@ -262,6 +262,7 @@ module.exports = {
 			let searchUrl = url + "results?";
 			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
 			if (options.type && searchType[options.type]) searchUrl += "sp=" + searchType[options.type] + "&";
+			else searchUrl += "sp=" + searchType["video"] + "&"; //Default type will be video
 
 			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), options));
 		});
