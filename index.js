@@ -303,6 +303,7 @@ module.exports = {
 			options = {
 				type: "video",
 				limit: 10,
+				page: 1,
 				...options
 			};
 
@@ -310,6 +311,7 @@ module.exports = {
 			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
 			if (options.type && searchType[options.type]) searchUrl += "sp=" + searchType[options.type] + "&";
 			else searchUrl += "sp=" + searchType["video"] + "&"; //Default type will be video
+			searchUrl += "page=" + options.page + "&"
 
 			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), options));
 		});
