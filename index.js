@@ -5,7 +5,8 @@ let url = "https://www.youtube.com/";
 
 const searchType = {
 	video: "EgIQAQ%253D%253D",
-	playlist: "EgIQAw%253D%253D"
+	playlist: "EgIQAw%253D%253D",
+	channel: "EgIQAg%253D%253D"
 };
 
 const getDuration = (s) => {
@@ -37,35 +38,54 @@ const parseSearch = (url, options) => {
 			const $ = cheerio.load(body);
 			
 			$(".yt-lockup").each((i, v) => {
-				const $video = $(v);
+				const $result = $(v);
 
-				let id = $video.find("a.yt-uix-tile-link").attr("href").replace("/watch?v=", "");
-				let uploadDate = null;
-				let viewCount = null;
-				let videoCount = null;
+				let id = $result.find("a.yt-uix-tile-link").attr("href");
+				let video = {};
+				let playlist = {};
+				let channel = {};
 	
 				if (options.type === "video") {
-					uploadDate = $video.find(".yt-lockup-meta-info li:first-of-type").text();
-					viewCount = +$video.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "");
-				}
-	
-				if (options.type === "playlist") {
+					id = id.replace("/watch?v=", "");
+					video = {
+						title: $result.find(".yt-lockup-title a").text(),
+						duration: getDuration($result.find(".video-time").text().trim()) || null,
+						thumbnail: $result.find(".yt-thumb-simple img").attr("data-thumb") || $result.find(".yt-thumb-simple img").attr("src"),
+						channel: {
+							id: $result.find(".yt-lockup-byline a").attr("href").split("/")[2],
+							name: $result.find(".yt-lockup-byline a").text() || null,
+							url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
+						},
+						uploadDate: $result.find(".yt-lockup-meta-info li:first-of-type").text(),
+						viewCount: +$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "")
+					};
+				} else if (options.type === "playlist") {
 					id = id.split("&list=")[1];
-					videoCount = +$video.find(".formatted-video-count-label b").text();
+					playlist = {
+						title: $result.find(".yt-lockup-title a").text(),
+						thumbnail: $result.find(".yt-thumb-simple img").attr("data-thumb") || $result.find(".yt-thumb-simple img").attr("src"),
+						channel: {
+							id: $result.find(".yt-lockup-byline a").attr("href").split("/")[2],
+							name: $result.find(".yt-lockup-byline a").text() || null,
+							url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
+						},
+						videoCount: +$result.find(".formatted-video-count-label b").text()
+					};
+				} else if (options.type === "channel") {
+					id = id.split("/")[2];
+					channel = {
+						name: $result.find(".yt-lockup-title a").text(),
+						thumbnail: `https:${$result.find(".yt-thumb-simple img").attr("data-thumb") || $result.find(".yt-thumb-simple img").attr("src")}`,
+						videoCount: +$result.find(".yt-lockup-meta-info li").text().replace(/[^0-9]/g, ""),
+						url: "https://www.youtube.com" + $result.find("a.yt-uix-tile-link").attr("href")
+					};
 				}
 
 				const result = {
 					id: id,
-					title: $video.find(".yt-lockup-title a").text(),
-					duration: getDuration($video.find(".video-time").text().trim()) || null,
-					thumbnail: $video.find(".yt-thumb-simple img").attr("data-thumb") || $video.find(".yt-thumb-simple img").attr("src"),
-					channel: {
-						name: $video.find(".yt-lockup-byline a").text() || null,
-						url: "https://www.youtube.com" + $video.find(".yt-lockup-byline a").attr("href") || null,
-					},
-					uploadDate: uploadDate,
-					viewCount: viewCount,
-					videoCount: videoCount
+					...options.type === "video" && {...video},
+					...options.type === "playlist" && {...playlist},
+					...options.type === "channel" && {...channel}
 				};
 
 				Object.keys(result).forEach((i) => {
@@ -95,16 +115,17 @@ const parseGetPlaylist = (url) => {
 			let videos = [];
 
 			$(".pl-video").each((i, v) => {
-				const $video = $(v);
+				const $result = $(v);
 				
 				const video = {
-					id: $video.find("button").attr("data-video-ids"),
-					title: $video.find("a.pl-video-title-link").text().replace(/\n/g,"").trim(),
-					duration: getDuration($video.find(".timestamp").text()) || null,
-					thumbnail: $video.find("img").attr("data-thumb"),
+					id: $result.find("button").attr("data-video-ids"),
+					title: $result.find("a.pl-video-title-link").text().replace(/\n/g,"").trim(),
+					duration: getDuration($result.find(".timestamp").text()) || null,
+					thumbnail: $result.find("img").attr("data-thumb"),
 					channel: {
-						name: $video.find(".pl-video-owner a").text(),
-						url: "https://www.youtube.com" + $video.find(".pl-video-owner a").attr("href")
+						id: $result.find(".pl-video-owner a").attr("href").split("/")[2],
+						name: $result.find(".pl-video-owner a").text(),
+						url: "https://www.youtube.com" + $result.find(".pl-video-owner a").attr("href")
 					}
 				};
 
@@ -115,13 +136,16 @@ const parseGetPlaylist = (url) => {
 			const playlist = {
 				id: $("#pl-header").attr("data-full-list-id"),
 				title: $(".pl-header-title").text().trim(),
-				videoCount: +$(".pl-header-details li")[1].children[0].data.replace(/[^0-9]/g, ""),
-				viewCount: +$(".pl-header-details li")[2].children[0].data.replace(/[^0-9]/g, ""),
-				lastUpdatedAt: $(".pl-header-details li")[3].children[0].data,
-				channel: {
-					name: $(".appbar-nav-avatar").attr("title"),
-					thumbnail: $(".appbar-nav-avatar").attr("src"),
-					url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
+				videoCount: +$(".pl-header-details li")[$(".pl-header-details li").length-3].children[0].data.replace(/[^0-9]/g, ""),
+				viewCount: +$(".pl-header-details li")[$(".pl-header-details li").length-2].children[0].data.replace(/[^0-9]/g, ""),
+				lastUpdatedAt: $(".pl-header-details li")[$(".pl-header-details li").length-1].children[0].data,
+				... typeof $("#appbar-nav a").attr("href") != "undefined" && {
+					channel: {
+						id: $("#appbar-nav a").attr("href").split("/")[2],
+						name: $(".appbar-nav-avatar").attr("title"),
+						thumbnail: $(".appbar-nav-avatar").attr("src"),
+						url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
+					}
 				},
 				videos: videos
 			};
@@ -165,7 +189,8 @@ const parseGetVideo = (url) => {
 				channel: {
 					id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
 					name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
-					thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url
+					thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
+					url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
 				},
 				uploadDate: videoInfo.dateText.simpleText,
 				viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
@@ -210,7 +235,8 @@ const parseGetRelated = (url, limit) => {
 					thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 					channel: {
 						id: videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
-						name: videoInfo.longBylineText.runs[0].text
+						name: videoInfo.longBylineText.runs[0].text,
+						url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 					},
 					uploadDate: videoInfo.publishedTimeText.simpleText,
 					viewCount: +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, ""),
@@ -243,7 +269,8 @@ const parseGetUpNext = (url) => {
 				id: videoInfo.videoId,
 				channel: {
 					id: videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
-					name: videoInfo.longBylineText.runs[0].text
+					name: videoInfo.longBylineText.runs[0].text,
+					url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 				},
 				title: videoInfo.title.simpleText,
 				duration: getDuration(videoInfo.lengthText.simpleText),
