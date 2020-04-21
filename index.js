@@ -44,6 +44,8 @@ const parseSearch = (url, options) => {
 				let video = {};
 				let playlist = {};
 				let channel = {};
+
+				if (id.startsWith("https://www.googleadservices.com")) return true; //Ignoring ad
 	
 				if (options.type === "video") {
 					id = id.replace("/watch?v=", "");
