@@ -5,6 +5,13 @@
 
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
+#### APIs:
+- [search](#searchquery-options)
+- [getPlaylist](#getplaylistplaylistid)
+- [getVideo](#getvideovideoid)
+- [getRelated](#getrelatedvideoid-limit--10)
+- [getUpNext](#getrelatedvideoid-limit--10)
+
 ## Installation
 ```bash
 npm install scrape-yt
