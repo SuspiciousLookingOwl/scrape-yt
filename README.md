@@ -1,4 +1,5 @@
 
+
 # scrape-yt
 [![NPM](https://nodei.co/npm/scrape-yt.png?downloads=true)](https://nodei.co/npm/scrape-yt)
 
@@ -14,7 +15,7 @@ npm install scrape-yt
 ```js
 const scrapeYoutube = require("scrape-yt");
 
-//Searches for video with keyword "Never gonna give you up" and limited to 5 videos
+//Searches for video with keyword "Never gonna give you up" and limited to 10 videos
 await scrapeYoutube.search("Never gonna give you up", {
     type: "video"
 }); 
@@ -31,7 +32,7 @@ scrapeYoutube.search("Never gonna give you up", {
 ## API
 ### search(query, [options])
 Searches for result with given `query`.  `options` is optional and can have the following keys
-- `type` - Search type, can be `playlist` or `video`
+- `type` - Search type, can be `video`, `playlist` or `channel`
 - `limit` - The max count of the search result
 
 
@@ -44,11 +45,12 @@ Result example (video):
         "duration": 213,
         "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg?sqp=-oaymwEjCPYBEIoBSFryq4qpAxUIARUAAAAAGAElAADIQj0AgKJDeAE=&rs=AOn4CLBW5JbJn5nTCNKe8PvMuOqEiuttiQ",
         "channel": {
+            "id": "UCuAXFkgsw1L7xaCfnd5JJOw",
             "name": "Official Rick Astley",
             "url": "https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw"
         },
         "uploadDate": "10 tahun yang lalu",
-        "viewCount": 679582223
+        "viewCount": 680314160
     },
     ...
 ]
@@ -61,6 +63,7 @@ Result example (playlist):
         "title": "Very Important Videos",
         "thumbnail": "https://i.ytimg.com/vi/0woboOZ9dmY/hqdefault.jpg?sqp=-oaymwEXCPYBEIoBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDcy1wd9LA-toJs7Gq-_I5-00n0Mw",
         "channel": {
+            "id": "electrickeye91",
             "name": "Thomas Frank",
             "url": "https://www.youtube.com/user/electrickeye91"
         },
@@ -69,6 +72,20 @@ Result example (playlist):
     ...
 ]
 ```
+Result example (channel):
+```json
+[
+    {
+        "id": "beegeestv",
+        "name": "beegees",
+        "thumbnail": "https://lh3.googleusercontent.com/a-/AOh14Gh8qGEFRMCi1sYKrapMiXS3pcOsejBEGK9WAGQsgA=s176-c-k-c0x00ffffff-no-rj-mo",
+        "videoCount": 55,
+        "url": "https://www.youtube.com/user/beegeestv"
+    },
+    ...
+]
+```
+
 
 ---
 ### getPlaylist(playlistId)
@@ -80,9 +97,10 @@ Result example:
     "id": "PLx65qkgCWNJIgVrndMrhsedBz1VDp0kfm",
     "title": "Very Important Videos",
     "videoCount": 37,
-    "viewCount": 143823,
+    "viewCount": 159705,
     "lastUpdatedAt": "Terakhir diperbarui pada 13 Okt 2019",
     "channel": {
+        "id": "electrickeye91",
         "name": "Thomas Frank",
         "thumbnail": "https://yt3.ggpht.com/a/AATXAJyAUDbyAyY3JkoMO-7Pvvf4QtksJF9Y6C6fTg=s100-c-k-c0xffffffff-no-rj-mo",
         "url": "https://www.youtube.com/user/electrickeye91"
@@ -94,8 +112,9 @@ Result example:
             "duration": 17,
             "thumbnail": "https://i.ytimg.com/vi/0woboOZ9dmY/hqdefault.jpg?sqp=-oaymwEiCKgBEF5IWvKriqkDFQgBFQAAAAAYASUAAMhCPQCAokN4AQ==&rs=AOn4CLD-Z5XXZlfjshvyd3K-oYIkGo-0Rw",
             "channel": {
-                "url": "https://www.youtube.com/channel/UCwPDMtvphYeGbzDKa8obOnQ",
-                "name": "Poorly Made"
+                "id": "UCwPDMtvphYeGbzDKa8obOnQ",
+                "name": "Poorly Made",
+                "url": "https://www.youtube.com/channel/UCwPDMtvphYeGbzDKa8obOnQ"
             }
         },
         ...
@@ -117,12 +136,13 @@ Result example:
     "channel": {
         "id": "UCuAXFkgsw1L7xaCfnd5JJOw",
         "name": "Official Rick Astley",
-        "thumbnail": "https://yt3.ggpht.com/a-/AOh14GirqtIADQGwQOF14rTXYeSzIkuySwxwlqAZyzo0mQ=s176-c-k-c0xffffffff-no-nd-rj"
+        "thumbnail": "https://yt3.ggpht.com/a-/AOh14GirqtIADQGwQOF14rTXYeSzIkuySwxwlqAZyzo0mQ=s176-c-k-c0xffffffff-no-nd-rj",
+        "url": "https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw"
     },
     "uploadDate": "Dipublikasikan tanggal 24 Okt 2009",
-    "viewCount": 679782747,
-    "likeCount": 5244401,
-    "dislikeCount": 193343,
+    "viewCount": 680735840,
+    "likeCount": 5257356,
+    "dislikeCount": 193590,
     "tags": [
         "#RickAstley",
         "#NeverGonnaGiveYouUp",
@@ -145,10 +165,11 @@ Result example:
         "thumbnail": "https://i.ytimg.com/vi/I_izvAbhExY/hqdefault.jpg?sqp=-oaymwEjCNACELwBSFryq4qpAxUIARUAAAAAGAElAADIQj0AgKJDeAE=&rs=AOn4CLCEl-X_ZnGdzoLqS-wfFcs1rED1LQ",
         "channel": {
             "id": "UCD9sCcKXnFxMeuFoNayVxeQ",
-            "name": "beegees"
+            "name": "beegees",
+            "url": "https://www.youtube.com/channel/UCD9sCcKXnFxMeuFoNayVxeQ"
         },
         "uploadDate": "10 tahun lalu",
-        "viewCount": 529986588
+        "viewCount": 530482048
     },
     ...
 ]
@@ -164,13 +185,14 @@ Result example:
     "id": "yPYZpwSpKmA",
     "channel": {
         "id": "UCuAXFkgsw1L7xaCfnd5JJOw",
-        "name": "Official Rick Astley"
+        "name": "Official Rick Astley",
+        "url": "https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw"
     },
     "title": "Rick Astley - Together Forever (Official Music Video)",
     "duration": 205,
     "thumbnail": "https://i.ytimg.com/vi/yPYZpwSpKmA/hqdefault.jpg?sqp=-oaymwEjCNACELwBSFryq4qpAxUIARUAAAAAGAElAADIQj0AgKJDeAE=&rs=AOn4CLAIYA0llYwvjijecWwCYJgXMx6YWA",
     "uploadDate": "10 tahun lalu",
-    "viewCount": 97992952
+    "viewCount": 98107272
 }
 
 ```
