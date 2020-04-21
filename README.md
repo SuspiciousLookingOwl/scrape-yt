@@ -33,7 +33,8 @@ scrapeYoutube.search("Never gonna give you up", {
 ### search(query, [options])
 Searches for result with given `query`.  `options` is optional and can have the following keys
 - `type` - Search type, can be `video`, `playlist` or `channel`
-- `limit` - The max count of the search result
+- `limit` - The max count of the search result (Default = 10)
+- `page` - Show result on specified page (Default = 1)
 
 
 Result example (video):
