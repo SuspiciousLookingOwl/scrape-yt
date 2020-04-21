@@ -198,7 +198,10 @@ const parseGetRelated = (url, limit) => {
 			for (var i = 0; i < videosInfo.length; i++) {
 
 				const videoInfo = videosInfo[i].compactVideoRenderer;
-				if (typeof videoInfo === "undefined" || typeof videoInfo.publishedTimeText === "undefined") continue;
+				if (typeof videoInfo === "undefined" || 
+					typeof videoInfo.publishedTimeText === "undefined" ||
+					typeof videoInfo.viewCountText === "undefined"
+				) continue;
 
 				const video = {
 					id: videoInfo.videoId,
@@ -246,7 +249,7 @@ const parseGetUpNext = (url) => {
 				duration: getDuration(videoInfo.lengthText.simpleText),
 				thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 				uploadDate: videoInfo.publishedTimeText ? videoInfo.publishedTimeText.simpleText : "",
-				viewCount: +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, ""),
+				viewCount: typeof videoInfo.viewCountText !== "undefined" ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : 0,
 			};
 
 			resolve(upNext);
