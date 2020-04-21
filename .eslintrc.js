@@ -12,6 +12,9 @@ module.exports = {
 		"ecmaVersion": 2018,
 		"sourceType": "module"
 	},
+	"standard": {
+	  "env": [ "mocha" ]
+	},
 	"rules": {
 		"indent": [
 			"error",
