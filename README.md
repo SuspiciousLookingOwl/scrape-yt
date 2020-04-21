@@ -34,6 +34,7 @@ Searches for result with given `query`.  `options` is optional and can have the 
 - `type` - Search type, can be `playlist` or `video`
 - `limit` - The max count of the search result
 
+
 Result example (video):
 ```json
 [
@@ -72,6 +73,7 @@ Result example (playlist):
 ---
 ### getPlaylist(playlistId)
 Get playlist information and videos from the given `playlistId`
+
 Result example:
 ```json
 {
@@ -105,6 +107,7 @@ Result example:
 ---
 ### getVideo(videoId)
 Get video information of given `videoId`
+
 Result example:
 ```json
 {
@@ -131,6 +134,7 @@ Result example:
 ---
 ### getRelated(videoId, limit = 10)
 Get videos related to given `videoId`. `limit` is optional (default is 10)
+
 Result example:
 ```json
 [
@@ -153,6 +157,7 @@ Result example:
 ---
 ### getUpNext(videoId)
 Get up next video of given `videoId`
+
 Result example:
 ```json
 {
