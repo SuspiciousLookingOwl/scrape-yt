@@ -3,6 +3,7 @@ const request = require("request");
 
 let url = "https://www.youtube.com/";
 
+
 const searchType = {
 	video: "EgIQAQ%253D%253D",
 	playlist: "EgIQAw%253D%253D",
@@ -71,7 +72,7 @@ const parseSearch = (url, options) => {
 							name: $result.find(".yt-lockup-byline a").text() || null,
 							url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
 						},
-						videoCount: +$result.find(".formatted-video-count-label b").text()
+						videoCount: +$result.find(".formatted-video-count-label b").text().replace(/[^0-9]/g, "")
 					};
 				} else if (options.type === "channel") {
 					id = id.split("/")[2];
@@ -94,9 +95,96 @@ const parseSearch = (url, options) => {
 					if (result[i] === null) delete result[i];
 				});
 
-				if (i < options.limit) results.push(result);
+				if (results.length < options.limit) results.push(result);
 				else return false;
 			});
+
+			//In rare cases, the data is not present on the dom, instead it's still on the script
+			if (results.length == 0) {
+
+				var dataInfo = [];
+				var scraped = false;
+
+				// Try to decode the data if it's still encoded
+				try {
+					let data = body.split("ytInitialData = JSON.parse('")[1].split("');</script>")[0];
+					data = data.replace(/\\x([0-9A-F]{2})/ig, function() {
+						return String.fromCharCode(parseInt(arguments[1], 16));
+					});
+					body = data;
+					scraped = true;
+				} catch(err) {}
+
+				//Trying to scrap for each possible ways of how Youtube serve the data in JS ordered by most common possibility
+				try {
+					dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":{\"contents\":")[2].split(",\"continuations\":[{")[0]);
+					scraped = true;
+				} catch(err) {}
+				if (!scraped) {
+					try {
+						dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":")[2].split("},{\"continuationItemRenderer\":{")[0]).contents;
+						scraped = true;
+					} catch(err) {}
+				}
+				if (!scraped) {
+					try {
+						dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":{\"contents\":")[1].split(",\"continuations\":[{")[0]);
+						dataInfo.shift();
+						scraped = true;
+					} catch(err) {}
+				}
+
+				for (var i = 0; i < dataInfo.length; i++) {
+					let data = dataInfo[i];
+					let result = {};
+
+					if (options.type === "video") {
+						data = data.videoRenderer;
+						result = {
+							id: data.videoId,
+							title: data.title.runs[0].text,
+							duration: getDuration(data.lengthText.simpleText) || null,
+							thumbnail: data.thumbnail.thumbnails[data.thumbnail.thumbnails.length - 1],
+							channel: {
+								id: data.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
+								name: data.ownerText.runs[0].text || null,
+								url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
+							},
+							uploadDate: data.publishedTimeText.simpleText,
+							viewCount: +data.viewCountText.simpleText.replace(/[^0-9]/g, "")
+						};
+					} else if (options.type === "playlist") {
+						data = data.playlistRenderer;
+						result = {
+							id: data.playlistId,
+							title: data.title.simpleText,
+							thumbnail: data.thumbnails[0].thumbnails[data.thumbnails[0].thumbnails.length-1],
+							channel: {
+								id: data.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
+								name: data.shortBylineText.runs[0].text,
+								url: "https://www.youtube.com" + data.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url,
+							},
+							videoCount: +data.videoCount.replace(/[^0-9]/g, ""),
+						};
+					} else if (options.type === "channel") {
+						data = data.channelRenderer;
+						result = {
+							id: data.channelId,
+							name: data.title.simpleText,
+							thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1]}`,
+							videoCount: +data.videoCountText.runs[0].text.replace(/[^0-9]/g, ""),
+							url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl
+						};
+					}
+	
+					Object.keys(result).forEach((i) => {
+						if (result[i] === null) delete result[i];
+					});
+	
+					if (results.length < options.limit) results.push(result);
+					else break;
+				}
+			}
 			resolve(results);
 
 		});
