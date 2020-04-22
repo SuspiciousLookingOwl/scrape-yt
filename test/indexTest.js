@@ -31,7 +31,7 @@ describe("index", function() {
 
     it("getUpNext exists", async function() {
         let video = await scrape.getUpNext(VIDEO_ID);
-        assert.typeOf(video.id, "string");
+        assert.lengthOf(video.id, 11);
     });
 
 })
