@@ -1,7 +1,8 @@
 module.exports = {
 	"env": {
 		"es6": true,
-		"node": true
+		"node": true,
+		"mocha": true
 	},
 	"extends": "eslint:recommended",
 	"globals": {
@@ -11,9 +12,6 @@ module.exports = {
 	"parserOptions": {
 		"ecmaVersion": 2018,
 		"sourceType": "module"
-	},
-	"standard": {
-	  "env": [ "mocha" ]
 	},
 	"rules": {
 		"indent": [
