@@ -33,7 +33,7 @@ const parseSearch = (url, options) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200) return reject("Failed to search videos");
+			if (err != null || res.statusCode != 200) return reject(new Error("Failed to serach videos"));
 
 			let results = [];
 			const $ = cheerio.load(body);
@@ -47,7 +47,7 @@ const parseSearch = (url, options) => {
 				let channel = {};
 
 				if (id.startsWith("https://www.googleadservices.com")) return true; //Ignoring ad
-	
+
 				if (options.type === "video") {
 					id = id.replace("/watch?v=", "");
 					video = {
@@ -150,7 +150,7 @@ const parseSearch = (url, options) => {
 								name: data.ownerText.runs[0].text || null,
 								url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
 							},
-							uploadDate: data.publishedTimeText.simpleText,
+							uploadDate: typeof data.publishedTimeText !== "undefined" ? data.publishedTimeText.simpleText : "",
 							viewCount: +data.viewCountText.simpleText.replace(/[^0-9]/g, "")
 						};
 					} else if (options.type === "playlist") {
@@ -199,7 +199,7 @@ const parseGetPlaylist = (url) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200) return reject("Failed to search videos");
+			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get playlist"));
 
 			const $ = cheerio.load(body);
 			let videos = [];
