@@ -1,3 +1,5 @@
+/* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
+
 const cheerio = require("cheerio");
 const request = require("request");
 
@@ -46,7 +48,7 @@ const parseSearch = (url, options) => {
 				let playlist = {};
 				let channel = {};
 
-				if (id.startsWith("https://www.googleadservices.com")) return true; //Ignoring ad
+				if (typeof id === "undefined" || id.startsWith("https://www.googleadservices.com")) return true; //Ignoring non video
 
 				if (options.type === "video") {
 					id = id.replace("/watch?v=", "");
@@ -103,7 +105,7 @@ const parseSearch = (url, options) => {
 			if (results.length == 0) {
 
 				var dataInfo = [];
-				var scraped = false;
+				var scrapped = false;
 
 				// Try to decode the data if it's still encoded
 				try {
@@ -112,49 +114,43 @@ const parseSearch = (url, options) => {
 						return String.fromCharCode(parseInt(arguments[1], 16));
 					});
 					body = data;
-					scraped = true;
-				} catch(err) {}
+				} catch(err) {} 
 
 				//Trying to scrap for each possible ways of how Youtube serve the data in JS ordered by most common possibility
 				try {
-					dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":{\"contents\":")[2].split(",\"continuations\":[{")[0]);
-					scraped = true;
+					dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":{\"contents\":")[body.split("{\"itemSectionRenderer\":{\"contents\":").length - 1].split(",\"continuations\":[{")[0]);
+					scrapped = true;
 				} catch(err) {}
-				if (!scraped) {
+				if (!scrapped) {
 					try {
-						dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":")[2].split("},{\"continuationItemRenderer\":{")[0]).contents;
-						scraped = true;
-					} catch(err) {}
-				}
-				if (!scraped) {
-					try {
-						dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":{\"contents\":")[1].split(",\"continuations\":[{")[0]);
-						dataInfo.shift();
-						scraped = true;
+						dataInfo = JSON.parse(body.split("{\"itemSectionRenderer\":")[body.split("{\"itemSectionRenderer\":").length - 1].split("},{\"continuationItemRenderer\":{")[0]).contents;
+						scrapped = true;
 					} catch(err) {}
 				}
 
 				for (var i = 0; i < dataInfo.length; i++) {
 					let data = dataInfo[i];
 					let result = {};
-
+					
 					if (options.type === "video") {
 						data = data.videoRenderer;
+						if(typeof data === "undefined") continue; 
 						result = {
 							id: data.videoId,
 							title: data.title.runs[0].text,
-							duration: getDuration(data.lengthText.simpleText) || null,
+							duration: typeof data.lengthText !== "undefined" ? getDuration(data.lengthText.simpleText) : null,
 							thumbnail: data.thumbnail.thumbnails[data.thumbnail.thumbnails.length - 1],
 							channel: {
 								id: data.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 								name: data.ownerText.runs[0].text || null,
 								url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
 							},
-							uploadDate: typeof data.publishedTimeText !== "undefined" ? data.publishedTimeText.simpleText : "",
-							viewCount: +data.viewCountText.simpleText.replace(/[^0-9]/g, "")
+							uploadDate: typeof data.publishedTimeText !== "undefined" ? data.publishedTimeText.simpleText : null,
+							viewCount: typeof data.viewCountText.simpleText !== "undefined" ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
 						};
 					} else if (options.type === "playlist") {
 						data = data.playlistRenderer;
+						if(typeof data === "undefined") continue;
 						result = {
 							id: data.playlistId,
 							title: data.title.simpleText,
@@ -168,11 +164,12 @@ const parseSearch = (url, options) => {
 						};
 					} else if (options.type === "channel") {
 						data = data.channelRenderer;
+						if(typeof data === "undefined") continue;
 						result = {
 							id: data.channelId,
 							name: data.title.simpleText,
 							thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1]}`,
-							videoCount: +data.videoCountText.runs[0].text.replace(/[^0-9]/g, ""),
+							videoCount: typeof data.videoCountText !== "undefined" ? +data.videoCountText.runs[0].text.replace(/[^0-9]/g, "") : null,
 							url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl
 						};
 					}
@@ -202,11 +199,15 @@ const parseGetPlaylist = (url) => {
 			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get playlist"));
 
 			const $ = cheerio.load(body);
+
+			let playlist = {};
 			let videos = [];
 
 			$(".pl-video").each((i, v) => {
 				const $result = $(v);
 				
+				if(typeof $result.find(".pl-video-owner a").attr("href") === "undefined") return true; //Continue if deleted video
+
 				const video = {
 					id: $result.find("button").attr("data-video-ids"),
 					title: $result.find("a.pl-video-title-link").text().replace(/\n/g,"").trim(),
@@ -219,27 +220,73 @@ const parseGetPlaylist = (url) => {
 					}
 				};
 
-				if(video.duration === null) return true; //Continue of deleted video
 				videos.push(video);
 			});
 
-			const playlist = {
-				id: $("#pl-header").attr("data-full-list-id"),
-				title: $(".pl-header-title").text().trim(),
-				videoCount: +$(".pl-header-details li")[$(".pl-header-details li").length-3].children[0].data.replace(/[^0-9]/g, ""),
-				viewCount: +$(".pl-header-details li")[$(".pl-header-details li").length-2].children[0].data.replace(/[^0-9]/g, ""),
-				lastUpdatedAt: $(".pl-header-details li")[$(".pl-header-details li").length-1].children[0].data,
-				... typeof $("#appbar-nav a").attr("href") != "undefined" && {
-					channel: {
-						id: $("#appbar-nav a").attr("href").split("/")[2],
-						name: $(".appbar-nav-avatar").attr("title"),
-						thumbnail: $(".appbar-nav-avatar").attr("src"),
-						url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
-					}
-				},
-				videos: videos
-			};
+			if (videos.length == 0) {
+				var playlistVideoList = JSON.parse(body.split("{\"playlistVideoListRenderer\":{\"contents\":")[1].split("}],\"playlistId\"")[0]+"}]");
 
+				for (var i = 0; i < playlistVideoList.length; i++) {
+
+					if(typeof playlistVideoList[i].videoInfo === "undefined") continue; //Continue if deleted video
+
+					let videoInfo = playlistVideoList[i].videoInfo.playlistVideoRenderer;
+					const video = {
+						id: videoInfo.videoId,
+						title: videoInfo.title.simpleText,
+						duration: getDuration(videoInfo.lengthText.simpleText),
+						thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.len-1],
+						channel: {
+							id: videoInfo.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
+							name: videoInfo.shortBylineText.runs[0].text,
+							url: "https://www.youtube.com" + videoInfo.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url
+						}
+					};
+	
+					videos.push(video);
+				}
+
+				
+				let sidebarRenderer = JSON.parse(body.split("{\"playlistSidebarRenderer\":")[1].split("\n")[0].slice(0, -3)).items;
+
+				let primaryRenderer = sidebarRenderer[0].playlistSidebarPrimaryInfoRenderer;
+				let videoOwner = sidebarRenderer[1].playlistSidebarSecondaryInfoRenderer.videoOwner;
+
+				playlist = {
+					id: primaryRenderer.title.runs[0].navigationEndpoint.watchEndpoint.playlistId,
+					title: primaryRenderer.title.runs[0].text,
+					videoCount: +primaryRenderer.stats[primaryRenderer.stats.length-3].runs[0].text.replace(/[^0-9]/g, ""),
+					viewCount: +primaryRenderer.stats[primaryRenderer.stats.length-2].simpleText.replace(/[^0-9]/g, ""),
+					lastUpdatedAt: primaryRenderer.stats[primaryRenderer.stats.length-1].simpleText,
+					... typeof videoOwner !== "undefined" && {
+						channel: {
+							id: videoOwner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
+							name: videoOwner.videoOwnerRenderer.title.runs[0].text,
+							thumbnail: videoOwner.videoOwnerRenderer.thumbnail.thumbnails[videoOwner.videoOwnerRenderer.thumbnail.thumbnails-1],
+							url: "https://www.youtube.com" + videoOwner.videoOwnerRenderer.title.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url
+						}
+					},
+					videos: videos
+				};
+				
+			} else {
+				playlist = {
+					id: $("#pl-header").attr("data-full-list-id"),
+					title: $(".pl-header-title").text().trim(),
+					videoCount: +$(".pl-header-details li")[$(".pl-header-details li").length-3].children[0].data.replace(/[^0-9]/g, ""),
+					viewCount: +$(".pl-header-details li")[$(".pl-header-details li").length-2].children[0].data.replace(/[^0-9]/g, ""),
+					lastUpdatedAt: $(".pl-header-details li")[$(".pl-header-details li").length-1].children[0].data,
+					... typeof $("#appbar-nav a").attr("href") !== "undefined" && {
+						channel: {
+							id: $("#appbar-nav a").attr("href").split("/")[2],
+							name: $(".appbar-nav-avatar").attr("title"),
+							thumbnail: $(".appbar-nav-avatar").attr("src"),
+							url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
+						}
+					},
+					videos: videos
+				};
+			} 
 			resolve(playlist);
 
 		});
@@ -303,33 +350,50 @@ const parseGetRelated = (url, limit) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get related videos"));
+			if (err != null || res.statusCode != 200 ) return reject(new Error("Failed to get related videos"));
 
-			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
-			let videosInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
+			let videosInfo = [];
+			let scrapped = false;
+
+			try {
+				let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
+				videosInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
+				scrapped = true;
+			} catch (err) {}
+
+			if(!scrapped){
+				try {
+					videosInfo = JSON.parse(body.split("{\"secondaryResults\":{\"results\":")[1].split(",\"continuations\":[{")[0]);
+					scrapped = true;
+				} catch (err) {}
+			}
+
+			if(!scrapped){
+				try {
+					videosInfo = JSON.parse(body.split("secondaryResults\":{\"secondaryResults\":")[1].split("},\"autoplay\":{\"autoplay\":{")[0]).results;
+					scrapped = true;
+				} catch (err) {}
+			}
 
 			let relatedVideos = [];
 
 			for (var i = 0; i < videosInfo.length; i++) {
 
 				const videoInfo = videosInfo[i].compactVideoRenderer;
-				if (typeof videoInfo === "undefined" || 
-					typeof videoInfo.publishedTimeText === "undefined" ||
-					typeof videoInfo.viewCountText === "undefined"
-				) continue;
+				if (typeof videoInfo === "undefined" || typeof videoInfo.viewCountText === "undefined") continue;
 
 				const video = {
 					id: videoInfo.videoId,
 					title: videoInfo.title.simpleText,
-					duration: getDuration(videoInfo.lengthText.simpleText),
+					duration: typeof videoInfo.lengthText !== "undefined" ? getDuration(videoInfo.lengthText.simpleText) : null,
 					thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 					channel: {
 						id: videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 						name: videoInfo.longBylineText.runs[0].text,
 						url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 					},
-					uploadDate: videoInfo.publishedTimeText.simpleText,
-					viewCount: +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, ""),
+					uploadDate: typeof videoInfo.publishedTimeText !== "undefined" ? videoInfo.publishedTimeText.simpleText : null,
+					viewCount: typeof videoInfo.viewCountText.simpleText !== "undefined" ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : +videoInfo.viewCountText.runs[0].text.replace(/[^0-9]/g, ""),
 				};
 
 				if (relatedVideos.length < limit) relatedVideos.push(video);
@@ -350,10 +414,30 @@ const parseGetUpNext = (url) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get up next video"));
+			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get up next video"));
 
-			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
-			let videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results[0].compactAutoplayRenderer.contents[0].compactVideoRenderer;
+			let videoInfo = null;
+			let scrapped = false;
+			
+			try {
+				let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
+				videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results[0].compactAutoplayRenderer.contents[0].compactVideoRenderer;
+				scrapped = true;
+			} catch (err) {}
+
+			if(!scrapped){
+				try {
+					videoInfo = JSON.parse(body.split("{\"secondaryResults\":{\"results\":")[1].split(",\"continuations\":[{")[0])[0].compactAutoplayRenderer.contents[0].compactVideoRenderer;
+					scrapped = true;
+				} catch (err) {}
+			}
+
+			if(!scrapped){
+				try {
+					videoInfo = JSON.parse(body.split("secondaryResults\":{\"secondaryResults\":")[1].split("},\"autoplay\":{\"autoplay\":{")[0]).results[0].compactAutoplayRenderer.contents[0].compactVideoRenderer;
+					scrapped = true;
+				} catch (err) {}
+			}
 
 			let upNext = {
 				id: videoInfo.videoId,
@@ -365,8 +449,8 @@ const parseGetUpNext = (url) => {
 				title: videoInfo.title.simpleText,
 				duration: getDuration(videoInfo.lengthText.simpleText),
 				thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
-				uploadDate: videoInfo.publishedTimeText ? videoInfo.publishedTimeText.simpleText : "",
-				viewCount: typeof videoInfo.viewCountText !== "undefined" ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : 0,
+				uploadDate: videoInfo.publishedTimeText ? videoInfo.publishedTimeText.simpleText : null,
+				viewCount: typeof videoInfo.viewCountText !== "undefined" ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : null,
 			};
 
 			resolve(upNext);
@@ -399,7 +483,7 @@ module.exports = {
 			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
 			if (options.type && searchType[options.type]) searchUrl += "sp=" + searchType[options.type] + "&";
 			else searchUrl += "sp=" + searchType["video"] + "&"; //Default type will be video
-			searchUrl += "page=" + options.page + "&"
+			searchUrl += "page=" + options.page + "&";
 
 			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), options));
 		});
