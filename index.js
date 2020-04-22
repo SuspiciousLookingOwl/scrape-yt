@@ -33,7 +33,7 @@ const parseSearch = (url, options) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200) return reject(new Error("Failed to serach videos"));
+			if (err != null || res.statusCode != 200) return reject(new Error("Failed to search"));
 
 			let results = [];
 			const $ = cheerio.load(body);
@@ -254,7 +254,7 @@ const parseGetVideo = (url) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject("Failed to get video");
+			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get video"));
 
 			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
 			let videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer;
@@ -303,7 +303,7 @@ const parseGetRelated = (url, limit) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject("Failed to get related videos");
+			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get related videos"));
 
 			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
 			let videosInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
@@ -350,7 +350,7 @@ const parseGetUpNext = (url) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject("Failed to get up next video");
+			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get up next video"));
 
 			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
 			let videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results[0].compactAutoplayRenderer.contents[0].compactVideoRenderer;
