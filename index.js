@@ -485,7 +485,7 @@ module.exports = {
 			else searchUrl += "sp=" + searchType["video"] + "&"; //Default type will be video
 			searchUrl += "page=" + options.page + "&";
 
-			resolve(parseSearch(searchUrl + "search_query=" + query.replace(/\s/g, "+"), options));
+			resolve(parseSearch(searchUrl + "search_query=" + encodeURIComponent(query), options));
 		});
 	},
 
