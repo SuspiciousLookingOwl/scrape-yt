@@ -4,8 +4,8 @@
   "description": "Simple package to scrape information from youtube such as search results, video information, related videos, and up next video",
   "main": "index.js",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "request": "^2.88.2"
+    "bent": "^7.3.0",
+    "cheerio": "^1.0.0-rc.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",

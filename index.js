@@ -1,15 +1,16 @@
 /* eslint no-empty: ["error", { "allowEmptyCatch": true }] */
 
 const cheerio = require("cheerio");
-const request = require("request");
+const bent = require("bent");
+const request = bent("string");
 
 let url = "https://www.youtube.com/";
 
 
 const searchType = {
-	video: "EgIQAQ%253D%253D",
-	playlist: "EgIQAw%253D%253D",
-	channel: "EgIQAg%253D%253D"
+	video: "EgIQAQ%3D%3D",
+	playlist: "EgIQAw%3D%253D",
+	channel: "EgIQAg%3D%253D"
 };
 
 const getDuration = (s) => {
@@ -30,13 +31,7 @@ const getDuration = (s) => {
 
 const parseSearch = (url, options) => {
 	return new Promise((resolve, reject) => {
-		request({
-			method: "GET",
-			url: url
-		}, (err, res, body) => {
-
-			if (err != null || res.statusCode != 200) return reject(new Error("Failed to search"));
-
+		request(url).then(body => {	
 			let results = [];
 			const $ = cheerio.load(body);
 			
@@ -184,6 +179,8 @@ const parseSearch = (url, options) => {
 			}
 			resolve(results);
 
+		}).catch(err => {
+			return reject(err);
 		});
 	});
 };
@@ -191,13 +188,7 @@ const parseSearch = (url, options) => {
 
 const parseGetPlaylist = (url) => {
 	return new Promise((resolve, reject) => {
-		request({
-			method: "GET",
-			url: url
-		}, (err, res, body) => {
-
-			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get playlist"));
-
+		request(url).then(body => {
 			const $ = cheerio.load(body);
 
 			let playlist = {};
@@ -293,6 +284,8 @@ const parseGetPlaylist = (url) => {
 			} 
 			resolve(playlist);
 
+		}).catch(err => {
+			return reject(err);
 		});
 	});
 };
@@ -300,12 +293,7 @@ const parseGetPlaylist = (url) => {
 
 const parseGetVideo = (url) => {
 	return new Promise((resolve, reject) => {
-		request({
-			method: "GET",
-			url: url
-		}, (err, res, body) => {
-
-			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get video"));
+		request(url).then(body => {
 
 			try {
 				let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
@@ -383,6 +371,8 @@ const parseGetVideo = (url) => {
 
 
 			}
+		}).catch(err => {
+			return reject(err);
 		});
 	});
 };
@@ -390,12 +380,7 @@ const parseGetVideo = (url) => {
 
 const parseGetRelated = (url, limit) => {
 	return new Promise((resolve, reject) => {
-		request({
-			method: "GET",
-			url: url
-		}, (err, res, body) => {
-
-			if (err != null || res.statusCode != 200 ) return reject(new Error("Failed to get related videos"));
+		request(url).then(body => {
 
 			let videosInfo = [];
 			let scrapped = false;
@@ -447,6 +432,8 @@ const parseGetRelated = (url, limit) => {
 
 			resolve(relatedVideos);
 
+		}).catch(err => {
+			return reject(err);
 		});
 	});
 };
@@ -454,13 +441,7 @@ const parseGetRelated = (url, limit) => {
 
 const parseGetUpNext = (url) => {
 	return new Promise((resolve, reject) => {
-		request({
-			method: "GET",
-			url: url
-		}, (err, res, body) => {
-
-			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get up next video"));
-
+		request(url).then(body => {
 			let videoInfo = null;
 			let scrapped = false;
 			
@@ -502,6 +483,8 @@ const parseGetUpNext = (url) => {
 
 			resolve(upNext);
 
+		}).catch(err => {
+			return reject(err);
 		});
 
 	});
@@ -529,10 +512,10 @@ module.exports = {
 			let searchUrl = url + "results?";
 			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
 			if (options.type && searchType[options.type]) searchUrl += "sp=" + searchType[options.type] + "&";
-			else searchUrl += "sp=" + searchType["video"] + "&"; //Default type will be video
+			else searchUrl += "sp=" + decodeURIComponent(searchType["video"]) + "&"; //Default type will be video
 			searchUrl += "page=" + options.page + "&";
 
-			resolve(parseSearch(searchUrl + "search_query=" + encodeURIComponent(query), options));
+			resolve(parseSearch(searchUrl + "search_query=" + query, options));
 		});
 	},
 
