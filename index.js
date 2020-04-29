@@ -521,7 +521,7 @@ module.exports = {
 
 	/**
 	 * Search youtube for playlist information.
-	 * @param videoId Id of the video
+	 * @param playlistId Id of the playlist
 	 */
 	getPlaylist: (playlistId) => {
 		return new Promise((resolve, reject) => {
