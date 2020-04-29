@@ -232,14 +232,14 @@ const parseGetPlaylist = (url) => {
 
 				for (var i = 0; i < playlistVideoList.length; i++) {
 
-					if(typeof playlistVideoList[i].videoInfo === "undefined") continue; //Continue if deleted video
+					let videoInfo = playlistVideoList[i].playlistVideoRenderer;
+					if(typeof videoInfo.shortBylineText === "undefined") continue; //Continue if deleted video
 
-					let videoInfo = playlistVideoList[i].videoInfo.playlistVideoRenderer;
 					const video = {
 						id: videoInfo.videoId,
 						title: videoInfo.title.simpleText,
 						duration: getDuration(videoInfo.lengthText.simpleText),
-						thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.len-1],
+						thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length-1].url,
 						channel: {
 							id: videoInfo.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 							name: videoInfo.shortBylineText.runs[0].text,
@@ -266,7 +266,7 @@ const parseGetPlaylist = (url) => {
 						channel: {
 							id: videoOwner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
 							name: videoOwner.videoOwnerRenderer.title.runs[0].text,
-							thumbnail: videoOwner.videoOwnerRenderer.thumbnail.thumbnails[videoOwner.videoOwnerRenderer.thumbnail.thumbnails-1],
+							thumbnail: videoOwner.videoOwnerRenderer.thumbnail.thumbnails[videoOwner.videoOwnerRenderer.thumbnail.thumbnails.length-1].url,
 							url: "https://www.youtube.com" + videoOwner.videoOwnerRenderer.title.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url
 						}
 					},
