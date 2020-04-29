@@ -139,7 +139,7 @@ const parseSearch = (url, options) => {
 							id: data.videoId,
 							title: data.title.runs[0].text,
 							duration: typeof data.lengthText !== "undefined" ? getDuration(data.lengthText.simpleText) : null,
-							thumbnail: data.thumbnail.thumbnails[data.thumbnail.thumbnails.length - 1],
+							thumbnail: data.thumbnail.thumbnails[data.thumbnail.thumbnails.length - 1].url,
 							channel: {
 								id: data.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 								name: data.ownerText.runs[0].text || null,
@@ -154,7 +154,7 @@ const parseSearch = (url, options) => {
 						result = {
 							id: data.playlistId,
 							title: data.title.simpleText,
-							thumbnail: data.thumbnails[0].thumbnails[data.thumbnails[0].thumbnails.length-1],
+							thumbnail: data.thumbnails[0].thumbnails[data.thumbnails[0].thumbnails.length-1].url,
 							channel: {
 								id: data.shortBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 								name: data.shortBylineText.runs[0].text,
@@ -168,7 +168,7 @@ const parseSearch = (url, options) => {
 						result = {
 							id: data.channelId,
 							name: data.title.simpleText,
-							thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1]}`,
+							thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1].url}`,
 							videoCount: typeof data.videoCountText !== "undefined" ? +data.videoCountText.runs[0].text.replace(/[^0-9]/g, "") : null,
 							url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl
 						};
