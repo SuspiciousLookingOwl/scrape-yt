@@ -224,7 +224,11 @@ const parseGetPlaylist = (url) => {
 			});
 
 			if (videos.length == 0) {
-				var playlistVideoList = JSON.parse(body.split("{\"playlistVideoListRenderer\":{\"contents\":")[1].split("}],\"playlistId\"")[0]+"}]");
+				try {
+					var playlistVideoList = JSON.parse(body.split("{\"playlistVideoListRenderer\":{\"contents\":")[1].split("}],\"playlistId\"")[0]+"}]");
+				} catch (err) { // Playlist not found
+					return resolve({});
+				}
 
 				for (var i = 0; i < playlistVideoList.length; i++) {
 
@@ -301,43 +305,84 @@ const parseGetVideo = (url) => {
 			url: url
 		}, (err, res, body) => {
 
-			if (err != null || res.statusCode != 200 || typeof body.split("RELATED_PLAYER_ARGS': ")[1] === "undefined") return reject(new Error("Failed to get video"));
+			if (err != null || res.statusCode != 200) return reject(new Error("Failed to get video"));
 
-			let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
-			let videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer;
-
-			let tags = [];
-			let description = "";
-
-			if (typeof videoInfo.topStandaloneBadge !== "undefined") {
-				videoInfo.topStandaloneBadge.standaloneCollectionBadgeRenderer.label.runs.forEach(tag => {
-					if (tag.text.trim()) tags.push(tag.text);
+			try {
+				let relatedPlayer = body.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
+				let videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer;
+	
+				let tags = [];
+				let description = "";
+	
+				if (typeof videoInfo.topStandaloneBadge !== "undefined") {
+					videoInfo.topStandaloneBadge.standaloneCollectionBadgeRenderer.label.runs.forEach(tag => {
+						if (tag.text.trim()) tags.push(tag.text);
+					});
+				}
+	
+				videoInfo.description.runs.forEach(descriptionPart => {
+					description += descriptionPart.text;
 				});
+	
+				const video = {
+					id: videoInfo.videoId,
+					title: videoInfo.title.runs[0].text,
+					description: description,
+					channel: {
+						id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
+						name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
+						thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
+						url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
+					},
+					uploadDate: videoInfo.dateText.simpleText,
+					viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
+					likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount || 0,
+					dislikeCount: videoInfo.likeButton.likeButtonRenderer.dislikeCount || 0,
+					tags: tags
+				};
+	
+				return resolve(video);
+			} catch (err) { // Alternative
+				let contents = JSON.parse(body.split("window[\"ytInitialData\"] = ")[1].split(";\n")[0]).contents.twoColumnWatchNextResults.results.results.contents;
+
+				let secondaryInfo = contents[1].videoSecondaryInfoRenderer;
+				let primaryInfo = contents[0].videoPrimaryInfoRenderer;
+				let videoInfo = {...secondaryInfo, ...primaryInfo};
+
+				let tags = [];
+				let description = "";
+
+				if (typeof videoInfo.superTitleLink !== "undefined") {
+					videoInfo.superTitleLink.runs.forEach(tag => {
+						if (tag.text.trim()) tags.push(tag.text);
+					});
+				}
+
+				videoInfo.description.runs.forEach(descriptionPart => {
+					description += descriptionPart.text;
+				});
+
+				const video = {
+					id: videoInfo.videoActions.menuRenderer.topLevelButtons[3].buttonRenderer.navigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId,
+					title: videoInfo.title.runs[0].text,
+					description: description,
+					channel: {
+						id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
+						name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
+						thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
+						url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
+					},
+					uploadDate: videoInfo.dateText.simpleText,
+					viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
+					likeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
+					dislikeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
+					tags: tags
+				};
+	
+				return resolve(video);
+
+
 			}
-
-			videoInfo.description.runs.forEach(descriptionPart => {
-				description += descriptionPart.text;
-			});
-
-			const video = {
-				id: videoInfo.videoId,
-				title: videoInfo.title.runs[0].text,
-				description: description,
-				channel: {
-					id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
-					name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
-					thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
-					url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
-				},
-				uploadDate: videoInfo.dateText.simpleText,
-				viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
-				likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount,
-				dislikeCount: videoInfo.likeButton.likeButtonRenderer.dislikeCount,
-				tags: tags
-			};
-
-			resolve(video);
-
 		});
 	});
 };
@@ -438,6 +483,8 @@ const parseGetUpNext = (url) => {
 					scrapped = true;
 				} catch (err) {}
 			}
+
+			if (videoInfo === null) return resolve({}); // Video not found
 
 			let upNext = {
 				id: videoInfo.videoId,
