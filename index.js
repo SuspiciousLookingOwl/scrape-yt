@@ -88,10 +88,6 @@ const parseSearch = (url, options) => {
 					...options.type === "channel" && {...channel}
 				};
 
-				Object.keys(result).forEach((i) => {
-					if (result[i] === null) delete result[i];
-				});
-
 				if (results.length < options.limit) results.push(result);
 				else return false;
 			});
