@@ -18,7 +18,7 @@ const searchType = {
 };
 
 
-module.exports = {
+export default {
 	/**
 	 * Search youtube for a list of  based on a search query.
 	 * @param query Search Query
