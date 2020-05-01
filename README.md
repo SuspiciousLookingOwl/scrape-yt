@@ -6,11 +6,17 @@
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
 #### APIs:
-- [search](#searchquery-options)
-- [getPlaylist](#getplaylistplaylistid)
-- [getVideo](#getvideovideoid)
-- [getRelated](#getrelatedvideoid-limit--10)
-- [getUpNext](#getrelatedvideoid-limit--10)
+- [scrape-yt](#scrape-yt)
+      - [APIs:](#apis)
+  - [Installation](#installation)
+  - [Usage Example](#usage-example)
+  - [API](#api)
+    - [search(query, [options])](#searchquery-options)
+    - [getPlaylist(playlistId)](#getplaylistplaylistid)
+    - [getVideo(videoId)](#getvideovideoid)
+    - [getRelated(videoId, limit = 10)](#getrelatedvideoid-limit--10)
+    - [getUpNext(videoId)](#getupnextvideoid)
+  - [License](#license)
 
 ## Installation
 ```bash
@@ -39,7 +45,7 @@ scrapeYoutube.search("Never gonna give you up", {
 ## API
 ### search(query, [options])
 Searches for result with given `query`.  `options` is optional and can have the following keys
-- `type` - Search type, can be `video`, `playlist` or `channel` (Default = `channel`)
+- `type` - Search type, can be `video`, `playlist` or `channel` (Default = `video`)
 - `limit` - The max count of the search result (Default = 10)
 - `page` - Show result on specified page (Default = 1)
 
