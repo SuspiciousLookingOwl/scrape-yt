@@ -2,7 +2,8 @@
   "name": "scrape-yt",
   "version": "1.1.0",
   "description": "Simple package to scrape information from youtube such as search results, video information, related videos, and up next video",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "bent": "^7.3.0",
     "cheerio": "^1.0.0-rc.3"
@@ -21,7 +22,8 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "test": "tsc && mocha"
+    "test": "mocha",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
