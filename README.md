@@ -25,12 +25,12 @@ const scrapeYt = require("scrape-yt").scrapeYt;
 // ES6 / TypeScript
 import { scrapeYt } from "scrape-yt";
 
-//Searches for video with keyword "Never gonna give you up" and limited to 10 videos
+// Searches for video with keyword "Never gonna give you up" and limited to 10 videos
 await scrapeYt.search("Never gonna give you up", {
     type: "video"
 }); 
 
-//Or use promises
+// Or use promises
 scrapeYt.search("Never gonna give you up", {
     type: "video"
 }).then(videos => {
@@ -39,7 +39,7 @@ scrapeYt.search("Never gonna give you up", {
 
 ```
 
-Type check (see available [types](https://github.com/VincentJonathan/scrape-yt/blob/typescript/src/common/types.ts)):
+Type check (see available [types](https://github.com/VincentJonathan/scrape-yt/blob/master/src/common/types.ts)):
 ```js
 
 import { scrapeYt, SearchOptions } from "scrape-yt";
