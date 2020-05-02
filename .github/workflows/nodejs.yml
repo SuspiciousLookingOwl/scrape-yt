@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ typescript ]
   pull_request:
-    branches: [ master ]
+    branches: [ typescript ]
 
 jobs:
   run_test:
@@ -22,4 +22,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
+    - run: npm build
     - run: npm test
