@@ -1,5 +1,5 @@
 const assert = require("chai").use(require("chai-string")).assert;
-const scrape = require("../index");
+const scrape = require("../dist/index").scrapeYt;
 
 
 const SEARCH_QUERY = "Never gonna give you up";

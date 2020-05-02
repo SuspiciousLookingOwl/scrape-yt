@@ -4,7 +4,15 @@ module.exports = {
 		"node": true,
 		"mocha": true
 	},
-	"extends": "eslint:recommended",
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
 	"globals": {
 		"Atomics": "readonly",
 		"SharedArrayBuffer": "readonly"
@@ -20,7 +28,7 @@ module.exports = {
 		],
 		"linebreak-style": [
 			"error",
-			"unix"
+			"windows"
 		],
 		"quotes": [
 			"error",
@@ -29,6 +37,7 @@ module.exports = {
 		"semi": [
 			"error",
 			"always"
-		]
+		],
+		"@typescript-eslint/no-non-null-assertion": "off"
 	}
 };

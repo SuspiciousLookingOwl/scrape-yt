@@ -14,25 +14,41 @@
 
 ## Installation
 ```bash
-npm install scrape-yt
+npm i scrape-yt
 ```
 
 ## Usage Example
-
+Basic usage:
 ```js
-const scrapeYoutube = require("scrape-yt");
+// ES5 
+const scrapeYt = require("scrape-yt").scrapeYt;
+// ES6 / TypeScript
+import { scrapeYt } from "scrape-yt";
 
 //Searches for video with keyword "Never gonna give you up" and limited to 10 videos
-await scrapeYoutube.search("Never gonna give you up", {
+await scrapeYt.search("Never gonna give you up", {
     type: "video"
 }); 
 
 //Or use promises
-scrapeYoutube.search("Never gonna give you up", {
+scrapeYt.search("Never gonna give you up", {
     type: "video"
 }).then(videos => {
     console.log(videos);
-}); 
+});
+
+```
+
+Type check (see available [types](https://github.com/VincentJonathan/scrape-yt/blob/typescript/src/common/types.ts)):
+```js
+
+import { scrapeYt, SearchOptions } from "scrape-yt";
+
+let options: SearchOptions = {
+    type: "channel",
+    limit: 5
+}
+await scrapeYt.search("Rick astley", options); 
 
 ```
 

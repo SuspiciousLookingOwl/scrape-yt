@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "strict": true,
+    "declaration": true,
+    "esModuleInterop": true, 
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
