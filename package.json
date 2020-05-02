@@ -10,9 +10,7 @@
   },
   "devDependencies": {
     "@types/bent": "^7.0.2",
-    "@types/chai": "^4.2.11",
     "@types/cheerio": "^0.22.18",
-    "@types/mocha": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "chai": "^4.2.0",
