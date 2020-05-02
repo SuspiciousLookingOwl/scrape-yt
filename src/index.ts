@@ -17,8 +17,9 @@ const searchType = {
 	channel: "EgIQAg%3D%253D"
 };
 
+export * from "./common/types";
 
-export = {
+export const scrapeYt = {
 	/**
 	 * Search youtube for a list of  based on a search query.
 	 * @param query Search Query
