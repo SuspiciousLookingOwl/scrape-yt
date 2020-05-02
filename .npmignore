@@ -1,2 +1,6 @@
 test
+src
+
+.eslintignore
 .eslintrc.js
+.tsconfig.json
