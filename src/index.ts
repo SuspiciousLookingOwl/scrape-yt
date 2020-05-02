@@ -24,8 +24,9 @@ export default {
 	 * @param query Search Query
 	 * @param options (optional) Option for search type and limit
 	 */
-	search: (query: string, options: SearchOptions): Promise<(Video|Channel|Playlist)[]> => {
+	search: (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
 		return new Promise((resolve, reject) => {
+			if (options === undefined) options = {};
 			options = {
 				type: "video",
 				limit: 10,

@@ -1,7 +1,7 @@
 export interface SearchOptions {
-    type: "video" | "channel" | "playlist";
-    limit: number;
-    page: number;
+    type?: "video" | "channel" | "playlist";
+    limit?: number;
+    page?: number;
 }
 
 export interface Video {

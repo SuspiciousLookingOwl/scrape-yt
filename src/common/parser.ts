@@ -79,7 +79,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 			} as Channel;
 		}
 
-		if (results.length < options.limit) results.push(result);
+		if (results.length < options.limit!) results.push(result);
 		else return false;
 	});
 
@@ -156,7 +156,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 				} as Channel;
 			}
 
-			if (results.length < options.limit) results.push(result);
+			if (results.length < options.limit!) results.push(result);
 			else break;
 		}
 	}
