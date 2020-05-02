@@ -1,10 +1,14 @@
 const assert = require("chai").use(require("chai-string")).assert;
-const scrape = require("../index");
+const scrape = require("../dist/index");
 
 
 const SEARCH_QUERY = "Never gonna give you up";
 const VIDEO_ID = "dQw4w9WgXcQ";
 const PLAYLIST_ID = "PLx65qkgCWNJIgVrndMrhsedBz1VDp0kfm";
+
+function orNull(val, type){
+	return typeof val === type || val === null;
+}
 
 
 describe("index", () => {
@@ -79,7 +83,7 @@ describe("index", () => {
 			assert.typeOf(videos[0].channel.id, "string");
 			assert.typeOf(videos[0].channel.name, "string");
 			assert.typeOf(videos[0].channel.url, "string");
-			assert.typeOf(videos[0].uploadDate, "string");
+			assert.isTrue(orNull(videos[0].uploadDate, "string"));
 			assert.typeOf(videos[0].viewCount, "number");
 		});
 	});
