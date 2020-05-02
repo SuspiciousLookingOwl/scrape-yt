@@ -4,4 +4,4 @@ src
 
 .eslintignore
 .eslintrc.js
-.tsconfig.json
+tsconfig.json
