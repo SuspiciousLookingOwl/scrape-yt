@@ -56,6 +56,7 @@ describe("index", () => {
 		const video = await scrape.getVideo(VIDEO_ID);
 		assert.equal(video.id, VIDEO_ID);
 		assert.equal(video.title, "Rick Astley - Never Gonna Give You Up (Video)");
+		assert.equal(video.duration, 212);
 		assert.typeOf(video.description, "string");
 		assert.typeOf(video.channel.id, "string");
 		assert.typeOf(video.channel.name, "string");
