@@ -12,7 +12,7 @@ import {
 
 
 const getDuration = (s: string): number => {
-	s = s.replace(/:/, ".");
+	s = s.replace(/:/g, ".");
 	const spl = s.split(".");
 	if (spl.length === 0) return +spl;
 	else {
@@ -36,6 +36,8 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 	const $ = cheerio.load(html);
 
 	$(".yt-lockup").each((i: number, v: CheerioElement) => {
+		if (results.length >= options.limit!) return false;
+
 		const $result = $(v);
 
 		const id = $result.find("a.yt-uix-tile-link").attr("href");
@@ -79,8 +81,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 			} as Channel;
 		}
 
-		if (results.length < options.limit!) results.push(result);
-		else return false;
+		results.push(result);
 	});
 
 	//Alternative
