@@ -156,6 +156,7 @@ Result example:
 {
     "id": "dQw4w9WgXcQ",
     "title": "Rick Astley - Never Gonna Give You Up (Video)",
+    "duration": 212,
     "description": "Rick Astley's official music video for “Never Gonna Give You Up”...",
     "channel": {
         "id": "UCuAXFkgsw1L7xaCfnd5JJOw",

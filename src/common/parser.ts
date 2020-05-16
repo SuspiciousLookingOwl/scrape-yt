@@ -262,6 +262,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 	try {
 		const relatedPlayer = html.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
 		const videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer;
+		const playerResponse = JSON.parse(JSON.parse(html.split("ytplayer.config = ")[1].split(";ytplayer.load = function()")[0]).args.player_response);
 
 		const tags: string[] = [];
 		let description = "";
@@ -279,6 +280,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 		const video = {
 			id: videoInfo.videoId,
 			title: videoInfo.title.runs[0].text,
+			duration: +playerResponse.videoDetails.lengthSeconds || null,
 			description: description,
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
@@ -299,7 +301,8 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 
 		const secondaryInfo = contents[1].videoSecondaryInfoRenderer;
 		const primaryInfo = contents[0].videoPrimaryInfoRenderer;
-		const videoInfo = {...secondaryInfo, ...primaryInfo};
+		const videoDetails = JSON.parse(html.split("window[\"ytInitialPlayerResponse\"] = ")[1].split(";\n")[0]).videoDetails;
+		const videoInfo = {...secondaryInfo, ...primaryInfo, videoDetails};
 
 		const tags: string[] = [];
 		let description = "";
@@ -317,6 +320,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 		const video = {
 			id: videoInfo.videoActions.menuRenderer.topLevelButtons[3].buttonRenderer.navigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId,
 			title: videoInfo.title.runs[0].text,
+			duration: +videoInfo.videoDetails.lengthSeconds || null,
 			description: description,
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
