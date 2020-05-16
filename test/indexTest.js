@@ -45,7 +45,7 @@ describe("index", () => {
 		assert.typeOf(playlist.channel.id, "string");
 		assert.typeOf(playlist.channel.name, "string");
 		assert.typeOf(playlist.channel.url, "string");
-		assert.equal(playlist.videos.length, 37);
+		assert.equal(playlist.videos.length, 36);
 		assert.equal(playlist.videos[0].id, "0woboOZ9dmY");
 		assert.equal(playlist.videos[0].title, "Poopy-di Scoop");
 		assert.equal(playlist.videos[0].duration, 17);
