@@ -323,7 +323,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 		});
 
 		const video = {
-			id: videoInfo.videoActions.menuRenderer.topLevelButtons[3].buttonRenderer.navigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId,
+			id: videoInfo.videoDetails.videoId,
 			title: videoInfo.title.runs[0].text,
 			duration: +videoInfo.videoDetails.lengthSeconds || null,
 			thumbnail: videoInfo.videoDetails.thumbnail.thumbnails[videoInfo.videoDetails.thumbnail.thumbnails.length - 1].url,
