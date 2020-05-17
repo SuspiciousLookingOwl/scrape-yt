@@ -57,10 +57,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 					url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
 				} as Channel,
 				uploadDate: $result.find(".yt-lockup-meta-info li:first-of-type").text(),
-				viewCount: 
-					$result.find(".yt-lockup-meta-info li:first-of-type").text() !== $result.find(".yt-lockup-meta-info li:last-of-type").text() ?
-						+$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "") :
-						null
+				viewCount: +$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "")
 			} as Video;
 		} else if (options.type === "playlist") {
 			result = {
@@ -88,7 +85,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 	});
 
 	//Alternative
-	if (results.length == 0) {
+	if (results.length === 0) {
 
 		let dataInfo = [];
 		let scrapped = false;
@@ -124,15 +121,15 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 				result = {
 					id: data.videoId,
 					title: data.title.runs[0].text,
-					duration: data.lengthText !== undefined ? getDuration(data.lengthText.simpleText) : null,
+					duration: data.lengthText ? getDuration(data.lengthText.simpleText) : null,
 					thumbnail: data.thumbnail.thumbnails[data.thumbnail.thumbnails.length - 1].url,
 					channel: {
 						id: data.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 						name: data.ownerText.runs[0].text || null,
 						url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
 					} as Channel,
-					uploadDate: data.publishedTimeText !== undefined ? data.publishedTimeText.simpleText : null,
-					viewCount: data.viewCountText !== undefined ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
+					uploadDate: data.publishedTimeText ? data.publishedTimeText.simpleText : null,
+					viewCount: data.viewCountText && data.viewCountText.simpleText ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
 				} as Video;
 			} else if (options.type === "playlist") {
 				data = data.playlistRenderer;
@@ -155,7 +152,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 					id: data.channelId,
 					name: data.title.simpleText,
 					thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1].url}`,
-					videoCount: data.videoCountText !== undefined ? +data.videoCountText.runs[0].text.replace(/[^0-9]/g, "") : null,
+					videoCount: data.videoCountText ? +data.videoCountText.runs[0].text.replace(/[^0-9]/g, "") : null,
 					url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl
 				} as Channel;
 			}
@@ -189,8 +186,25 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 		videos.push(video);
 	});
 
-	// Alternative
-	if (videos.length == 0) {
+	if (videos.length > 0) {
+		playlist = {
+			id: $("#pl-header").attr("data-full-list-id"),
+			title: $(".pl-header-title").text().trim(),
+			videoCount: +$(".pl-header-details li")[$(".pl-header-details li").length-3].children[0].data!.replace(/[^0-9]/g, ""),
+			viewCount: +$(".pl-header-details li")[$(".pl-header-details li").length-2].children[0].data!.replace(/[^0-9]/g, ""),
+			lastUpdatedAt: $(".pl-header-details li")[$(".pl-header-details li").length-1].children[0].data,
+			...  $("#appbar-nav a").attr("href") !== undefined && {
+				channel: {
+					id: $("#appbar-nav a").attr("href")!.split("/")[2],
+					name: $(".appbar-nav-avatar").attr("title"),
+					thumbnail: $(".appbar-nav-avatar").attr("src"),
+					url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
+				}
+			},
+			videos: videos as Video[]
+		} as PlaylistDetailed;				
+	} else {
+		// Alternative
 		let playlistVideoList = null;
 		try {
 			playlistVideoList = JSON.parse(html.split("{\"playlistVideoListRenderer\":{\"contents\":")[1].split("}],\"playlistId\"")[0]+"}]");
@@ -239,24 +253,6 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 			},
 			videos: videos as Video[]
 		} as PlaylistDetailed;
-				
-	} else {
-		playlist = {
-			id: $("#pl-header").attr("data-full-list-id"),
-			title: $(".pl-header-title").text().trim(),
-			videoCount: +$(".pl-header-details li")[$(".pl-header-details li").length-3].children[0].data!.replace(/[^0-9]/g, ""),
-			viewCount: +$(".pl-header-details li")[$(".pl-header-details li").length-2].children[0].data!.replace(/[^0-9]/g, ""),
-			lastUpdatedAt: $(".pl-header-details li")[$(".pl-header-details li").length-1].children[0].data,
-			...  $("#appbar-nav a").attr("href") !== undefined && {
-				channel: {
-					id: $("#appbar-nav a").attr("href")!.split("/")[2],
-					name: $(".appbar-nav-avatar").attr("title"),
-					thumbnail: $(".appbar-nav-avatar").attr("src"),
-					url: "https://www.youtube.com" + $("#appbar-nav a").attr("href")
-				}
-			},
-			videos: videos as Video[]
-		} as PlaylistDetailed;
 	} 
 	return playlist;
 
@@ -290,7 +286,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
 				name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
-				thumbnail: videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
+				thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
 				url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
 			} as Channel,
 			uploadDate: videoInfo.dateText.simpleText,
@@ -337,8 +333,14 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			} as Channel,
 			uploadDate: videoInfo.dateText.simpleText,
 			viewCount: +videoInfo.videoDetails.viewCount,
-			likeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
-			dislikeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
+			likeCount: 
+				videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility ? 
+					+videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : 
+					null,
+			dislikeCount: 
+				videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility ? 
+					+videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : 
+					null,
 			isLiveContent: videoInfo.videoDetails.isLiveContent,
 			tags: tags
 		} as VideoDetailed;
@@ -379,15 +381,15 @@ export function parseGetRelated(html: string, limit: number): Video[] {
 		const video = {
 			id: videoInfo.videoId,
 			title: videoInfo.title.simpleText,
-			duration:  videoInfo.lengthText !== undefined ? getDuration(videoInfo.lengthText.simpleText) : null,
+			duration:  videoInfo.lengthText ? getDuration(videoInfo.lengthText.simpleText) : null,
 			thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 			channel: {
 				id: videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId,
 				name: videoInfo.longBylineText.runs[0].text,
 				url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 			} as Channel,
-			uploadDate:  videoInfo.publishedTimeText !== undefined ? videoInfo.publishedTimeText.simpleText : null,
-			viewCount:  videoInfo.viewCountText !== undefined ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : +videoInfo.viewCountText.runs[0].text.replace(/[^0-9]/g, ""),
+			uploadDate:  videoInfo.publishedTimeText ? videoInfo.publishedTimeText.simpleText : null,
+			viewCount:  videoInfo.viewCountText && videoInfo.viewCountText.simpleText ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : +videoInfo.viewCountText.runs[0].text.replace(/[^0-9]/g, ""),
 		} as Video;
 
 		if (relatedVideos.length < limit) relatedVideos.push(video);
@@ -429,10 +431,10 @@ export function parseGetUpNext(html: string): Video | {} {
 			url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 		},
 		title: videoInfo.title.simpleText,
-		duration: getDuration(videoInfo.lengthText.simpleText),
+		duration: videoInfo.lengthText ? getDuration(videoInfo.lengthText.simpleText) : null,
 		thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length - 1].url,
 		uploadDate: videoInfo.publishedTimeText ? videoInfo.publishedTimeText.simpleText : null,
-		viewCount:  videoInfo.viewCountText !== undefined ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : null,
+		viewCount:  videoInfo.viewCountText && videoInfo.viewCountText.simpleText ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : null,
 	};
 
 	return upNext;
