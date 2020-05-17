@@ -266,7 +266,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 	try {
 		const relatedPlayer = html.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
 		const videoInfo = JSON.parse(JSON.parse(relatedPlayer.substring(0, relatedPlayer.length - 1)).watch_next_response).contents.twoColumnWatchNextResults.results.results.contents[0].itemSectionRenderer.contents[0].videoMetadataRenderer;
-		const playerResponse = JSON.parse(JSON.parse(html.split("ytplayer.config = ")[1].split(";ytplayer.load = function()")[0]).args.player_response);
+		const videoDetails = JSON.parse(JSON.parse(html.split("ytplayer.config = ")[1].split(";ytplayer.load = function()")[0]).args.player_response).videoDetails;
 
 		const tags: string[] = [];
 		let description = "";
@@ -284,19 +284,20 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 		const video = {
 			id: videoInfo.videoId,
 			title: videoInfo.title.runs[0].text,
-			duration: +playerResponse.videoDetails.lengthSeconds || null,
-			thumbnail: playerResponse.videoDetails.thumbnail.thumbnails[+playerResponse.videoDetails.thumbnail.thumbnails.length - 1].url,
+			duration: +videoDetails.lengthSeconds || null,
+			thumbnail: videoDetails.thumbnail.thumbnails[+videoDetails.thumbnail.thumbnails.length - 1].url,
 			description: description,
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
 				name: videoInfo.owner.videoOwnerRenderer.title.runs[0].text,
-				thumbnail: "https:" + videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
+				thumbnail: videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails[videoInfo.owner.videoOwnerRenderer.thumbnail.thumbnails.length - 1].url,
 				url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
 			} as Channel,
 			uploadDate: videoInfo.dateText.simpleText,
-			viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
+			viewCount: +videoDetails.viewCount,
 			likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount || null,
 			dislikeCount: videoInfo.likeButton.likeButtonRenderer.dislikeCount || null,
+			isLiveContent: videoDetails.isLiveContent,
 			tags: tags
 		} as VideoDetailed;
 
@@ -335,9 +336,10 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 				url: "https://www.youtube.com/channel/" + videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId
 			} as Channel,
 			uploadDate: videoInfo.dateText.simpleText,
-			viewCount: +videoInfo.viewCount.videoViewCountRenderer.viewCount.simpleText.replace(/[^0-9]/g, ""),
+			viewCount: +videoInfo.videoDetails.viewCount,
 			likeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[0].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
 			dislikeCount: videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility ? +videoInfo.videoActions.menuRenderer.topLevelButtons[1].toggleButtonRenderer.defaultText.accessibility.accessibilityData.label.replace(/[^0-9]/g, "") : null,
+			isLiveContent: videoInfo.videoDetails.isLiveContent,
 			tags: tags
 		} as VideoDetailed;
 

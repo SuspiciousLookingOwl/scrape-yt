@@ -25,6 +25,7 @@ export interface VideoDetailed {
   viewCount: number|null;
   likeCount: number|null;
   dislikeCount: number|null;
+  isLiveContent: boolean;
   tags: string[];
 }
 
