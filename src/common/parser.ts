@@ -294,8 +294,8 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			} as Channel,
 			uploadDate: videoInfo.dateText.simpleText,
 			viewCount: +videoDetails.viewCount,
-			likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount || null,
-			dislikeCount: videoInfo.likeButton.likeButtonRenderer.dislikeCount || null,
+			likeCount: videoInfo.likeButton.likeButtonRenderer.likeCount !== undefined ?  videoInfo.likeButton.likeButtonRenderer.likeCount : null,
+			dislikeCount: videoInfo.likeButton.likeButtonRenderer.dislikeCount !== undefined ? videoInfo.likeButton.likeButtonRenderer.likeCount : null,
 			isLiveContent: videoDetails.isLiveContent,
 			tags: tags
 		} as VideoDetailed;
