@@ -285,6 +285,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			id: videoInfo.videoId,
 			title: videoInfo.title.runs[0].text,
 			duration: +playerResponse.videoDetails.lengthSeconds || null,
+			thumbnail: playerResponse.videoDetails.thumbnail.thumbnails[+playerResponse.videoDetails.thumbnail.thumbnails.length - 1].url,
 			description: description,
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
@@ -325,6 +326,7 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			id: videoInfo.videoActions.menuRenderer.topLevelButtons[3].buttonRenderer.navigationEndpoint.modalEndpoint.modal.modalWithTitleAndButtonRenderer.button.buttonRenderer.navigationEndpoint.signInEndpoint.nextEndpoint.watchEndpoint.videoId,
 			title: videoInfo.title.runs[0].text,
 			duration: +videoInfo.videoDetails.lengthSeconds || null,
+			thumbnail: videoInfo.videoDetails.thumbnail.thumbnails[videoInfo.videoDetails.thumbnail.thumbnails.length - 1].url,
 			description: description,
 			channel: {
 				id: videoInfo.owner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,

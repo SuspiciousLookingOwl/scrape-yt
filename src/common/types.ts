@@ -18,6 +18,7 @@ export interface VideoDetailed {
   id: string;
   title: string;
   duration: number|null;
+  thumbnail: string;
   description: string;
   channel: Channel;
   uploadDate: string;
