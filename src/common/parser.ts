@@ -57,7 +57,10 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 					url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
 				} as Channel,
 				uploadDate: $result.find(".yt-lockup-meta-info li:first-of-type").text(),
-				viewCount: +$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "")
+				viewCount: 
+					$result.find(".yt-lockup-meta-info li:first-of-type").text() !== $result.find(".yt-lockup-meta-info li:last-of-type").text() ?
+						+$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "") :
+						null
 			} as Video;
 		} else if (options.type === "playlist") {
 			result = {
@@ -129,7 +132,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 						url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
 					} as Channel,
 					uploadDate: data.publishedTimeText !== undefined ? data.publishedTimeText.simpleText : null,
-					viewCount: data.viewCountText.simpleText !== undefined ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
+					viewCount: data.viewCountText !== undefined ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
 				} as Video;
 			} else if (options.type === "playlist") {
 				data = data.playlistRenderer;
@@ -380,7 +383,7 @@ export function parseGetRelated(html: string, limit: number): Video[] {
 				url: "https://www.youtube.com/channel/" + videoInfo.longBylineText.runs[0].navigationEndpoint.browseEndpoint.browseId
 			} as Channel,
 			uploadDate:  videoInfo.publishedTimeText !== undefined ? videoInfo.publishedTimeText.simpleText : null,
-			viewCount:  videoInfo.viewCountText.simpleText !== undefined ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : +videoInfo.viewCountText.runs[0].text.replace(/[^0-9]/g, ""),
+			viewCount:  videoInfo.viewCountText !== undefined ? +videoInfo.viewCountText.simpleText.replace(/[^0-9]/g, "") : +videoInfo.viewCountText.runs[0].text.replace(/[^0-9]/g, ""),
 		} as Video;
 
 		if (relatedVideos.length < limit) relatedVideos.push(video);
