@@ -10,6 +10,10 @@ function orNull(val, type){
 	return typeof val === type || val === null;
 }
 
+function equalOr(val, ...eq) {
+	return eq.includes(val);
+}
+
 
 describe("index", () => {
 
@@ -42,7 +46,7 @@ describe("index", () => {
 		});
 		it("match 1st channel from search result", () => {
 			const channel = channels[0];
-			assert.equal(channel.id, "LinusTechTips");
+			assert.isTrue(equalOr(channel.id, "LinusTechTips", "UCXuqSBlHAE6Xw-yeJA0Tunw"));
 			assert.equal(channel.name, "Linus Tech Tips");
 			assert.typeOf(channel.thumbnail, "string");
 			assert.isAbove(channel.videoCount, 4900);
