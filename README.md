@@ -26,9 +26,10 @@ const scrapeYt = require("scrape-yt").scrapeYt;
 import { scrapeYt } from "scrape-yt";
 
 // Searches for video with keyword "Never gonna give you up" and limited to 10 videos
-await scrapeYt.search("Never gonna give you up", {
-    type: "video"
-}); 
+(async() => {
+    let videos = await scrapeYt.search("Never gonna give you up");
+    console.log(videos[0]);
+})();
 
 // Or use promises
 scrapeYt.search("Never gonna give you up", {
@@ -168,6 +169,7 @@ Result example:
     "viewCount": 680735840,
     "likeCount": 5257356,
     "dislikeCount": 193590,
+    "isLiveContent": false,
     "tags": [
         "#RickAstley",
         "#NeverGonnaGiveYouUp",
