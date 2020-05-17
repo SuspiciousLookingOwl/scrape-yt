@@ -13,7 +13,57 @@ function orNull(val, type){
 
 describe("index", () => {
 
-	describe("search", () => {	
+	describe("search video", () => {	
+		let videos;
+		before(async () => {
+			videos = await scrape.search(SEARCH_QUERY, {limit: 3});
+		});
+		it("search result should be 3", () => {
+			assert.equal(videos.length, 3);
+		});
+		it("match 1st video from search result", () => {
+			const video = videos[0];
+			assert.equal(video.id, VIDEO_ID);
+			assert.equal(video.title, "Rick Astley - Never Gonna Give You Up (Video)");
+			assert.equal(video.duration, 213);
+			assert.startsWith(video.thumbnail, "https://i.ytimg.com/");
+			assert.typeOf(video.channel.id, "string");
+			assert.typeOf(video.channel.name, "string");
+			assert.typeOf(video.channel.url, "string");
+			assert.typeOf(video.uploadDate, "string");
+			assert.isAbove(video.viewCount, 680000000);
+		});
+	});
+
+	describe("search channel", () => {	
+		let channels;
+		before(async () => {
+			channels = await scrape.search("Linus Tech Tips", {limit: 1, type: "channel"});
+		});
+		it("match 1st channel from search result", () => {
+			const channel = channels[0];
+			assert.equal(channel.id, "LinusTechTips");
+			assert.equal(channel.name, "Linus Tech Tips");
+			assert.typeOf(channel.thumbnail, "string");
+			assert.isAbove(channel.videoCount, 4900);
+		});
+	});
+
+	describe("search playlist", () => {	
+		let playlists;
+		before(async () => {
+			playlists = await scrape.search("WAN show", {limit: 1, type: "playlist"});
+		});
+		it("match 1st playlist from search result", () => {
+			const playlist = playlists[0];
+			assert.equal(playlist.id, "PL8mG-RkN2uTw7PhlnAr4pZZz2QubIbujH");
+			assert.equal(playlist.title, "The WAN Show Archive");
+			assert.typeOf(playlist.thumbnail, "string");
+			assert.isAbove(playlist.videoCount, 260);
+		});
+	});
+
+	describe("search video", () => {	
 		let videos;
 		before(async () => {
 			videos = await scrape.search(SEARCH_QUERY, {limit: 3});
@@ -45,6 +95,7 @@ describe("index", () => {
 		assert.typeOf(playlist.channel.id, "string");
 		assert.typeOf(playlist.channel.name, "string");
 		assert.typeOf(playlist.channel.url, "string");
+		assert.startsWith(playlist.channel.thumbnail, "https://yt3.ggpht.com");
 		assert.equal(playlist.videos.length, 36);
 		assert.equal(playlist.videos[0].id, "0woboOZ9dmY");
 		assert.equal(playlist.videos[0].title, "Poopy-di Scoop");
@@ -61,10 +112,12 @@ describe("index", () => {
 		assert.typeOf(video.channel.id, "string");
 		assert.typeOf(video.channel.name, "string");
 		assert.typeOf(video.channel.url, "string");
+		assert.startsWith(video.channel.thumbnail, "https://yt3.ggpht.com");
 		assert.typeOf(video.uploadDate, "string");
 		assert.isAbove(video.viewCount, 680000000);
 		assert.isAbove(video.likeCount, 5200000);
 		assert.isAbove(video.dislikeCount, 190000);
+		assert.equal(video.isLiveContent, false);
 		assert.equal(video.tags.length, 3);
 	});
 
