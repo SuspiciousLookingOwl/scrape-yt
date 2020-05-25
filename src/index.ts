@@ -39,8 +39,8 @@ export const scrapeYt = {
 			if (options.type && searchType[options.type]) searchUrl += `sp=${searchType[options.type]}&`;
 			else searchUrl += `sp=${searchType["video"]}&`; //Default type will be video
 			searchUrl += `page=${options.page}&search_query=${query}`;
-			request(searchUrl).then((html: string) => {
-				resolve(ps.parseSearch(html, options));
+			request(searchUrl).then(async (html: string) => {
+				resolve(await ps.parseSearch(html, options));
 			}).catch((err) => {
 				reject(err);
 			});
@@ -55,8 +55,8 @@ export const scrapeYt = {
 		return new Promise((resolve, reject) => {
 			if (playlistId.trim().length === 0) return reject(new Error("Playlist ID cannot be blank"));
 			const playlistUrl = `${url}playlist?list=${playlistId}`;
-			request(playlistUrl).then((html: string) => {
-				resolve(ps.parseGetPlaylist(html));
+			request(playlistUrl).then(async (html: string) => {
+				resolve(await ps.parseGetPlaylist(html));
 			}).catch((err) => {
 				reject(err);
 			});
@@ -71,8 +71,8 @@ export const scrapeYt = {
 		return new Promise((resolve, reject) => {
 			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
 			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetVideo(html));
+			request(videoUrl).then(async (html: string) => {
+				resolve(await ps.parseGetVideo(html));
 			}).catch((err) => {
 				reject(err);
 			});
@@ -88,8 +88,8 @@ export const scrapeYt = {
 		return new Promise((resolve, reject) => {
 			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
 			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetRelated(html, limit));
+			request(videoUrl).then(async (html: string) => {
+				resolve(await ps.parseGetRelated(html, limit));
 			}).catch((err) => {
 				reject(err);
 			});
@@ -104,8 +104,8 @@ export const scrapeYt = {
 		return new Promise((resolve, reject) => {
 			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
 			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetUpNext(html));
+			request(videoUrl).then(async (html: string) => {
+				resolve(await ps.parseGetUpNext(html));
 			}).catch((err) => {
 				reject(err);
 			});
