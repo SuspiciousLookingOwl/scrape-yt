@@ -25,58 +25,44 @@ export const scrapeYt = {
 	 * @param query Search Query
 	 * @param options (optional) Option for search type and limit
 	 */
-	search: (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
-		return new Promise((resolve, reject) => {
-			if (options === undefined) options = {};
-			options = {
-				type: "video",
-				limit: 10,
-				page: 1,
-				...options
-			};
-			let searchUrl = url + "results?";
-			if (query.trim().length === 0) return reject(new Error("Query cannot be blank"));
-			if (options.type && searchType[options.type]) searchUrl += `sp=${searchType[options.type]}&`;
-			else searchUrl += `sp=${searchType["video"]}&`; //Default type will be video
-			searchUrl += `page=${options.page}&search_query=${query}`;
-			request(searchUrl).then((html: string) => {
-				resolve(ps.parseSearch(html, options));
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	search: async (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
+		if (options === undefined) options = {};
+		options = {
+			type: "video",
+			limit: 10,
+			page: 1,
+			...options
+		};
+		let searchUrl = url + "results?";
+		if (query.trim().length === 0) throw(new Error("Query cannot be blank"));
+		if (options.type && searchType[options.type]) searchUrl += `sp=${searchType[options.type]}&`;
+		else searchUrl += `sp=${searchType["video"]}&`; //Default type will be video
+		searchUrl += `page=${options.page}&search_query=${query}`;
+			
+		const html = await request(searchUrl);
+		return ps.parseSearch(html, options);
 	},
 
 	/**
 	 * Search youtube for playlist information.
 	 * @param playlistId Id of the playlist
 	 */
-	getPlaylist: (playlistId: string): Promise<PlaylistDetailed|{}> => {
-		return new Promise((resolve, reject) => {
-			if (playlistId.trim().length === 0) return reject(new Error("Playlist ID cannot be blank"));
-			const playlistUrl = `${url}playlist?list=${playlistId}`;
-			request(playlistUrl).then((html: string) => {
-				resolve(ps.parseGetPlaylist(html));
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	getPlaylist: async (playlistId: string): Promise<PlaylistDetailed|{}> => {
+		if (playlistId.trim().length === 0) throw (new Error("Playlist ID cannot be blank"));
+		const playlistUrl = `${url}playlist?list=${playlistId}`;
+		const html = await request(playlistUrl);
+		return ps.parseGetPlaylist(html);
 	},
 
 	/**
 	 * Search youtube for video information.
 	 * @param videoId Id of the video
 	 */
-	getVideo: (videoId: string): Promise<VideoDetailed|{}> => {
-		return new Promise((resolve, reject) => {
-			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
-			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetVideo(html));
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	getVideo: async (videoId: string): Promise<VideoDetailed|{}> => {
+		if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
+		const videoUrl = `${url}watch?v=${videoId}`;
+		const html = await request(videoUrl);
+		return ps.parseGetVideo(html);
 	},
 
 	/**
@@ -84,32 +70,22 @@ export const scrapeYt = {
 	 * @param videoId Id of the video
 	 * @param limit (optional) Max videos count
 	 */
-	getRelated: (videoId: string, limit = 10): Promise<Video[]> => {
-		return new Promise((resolve, reject) => {
-			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
-			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetRelated(html, limit));
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	getRelated: async (videoId: string, limit = 10): Promise<Video[]> => {
+		if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
+		const videoUrl = `${url}watch?v=${videoId}`;
+		const html = await request(videoUrl);
+		return ps.parseGetRelated(html, limit);
 	},
 
 	/**
 	 * Search youtube for up next video based on videoId.
 	 * @param videoId Id of the video
 	 */
-	getUpNext: (videoId: string): Promise<Video|{}> => {
-		return new Promise((resolve, reject) => {
-			if (videoId.trim().length === 0) return reject(new Error("Video ID cannot be blank"));
-			const videoUrl = `${url}watch?v=${videoId}`;
-			request(videoUrl).then((html: string) => {
-				resolve(ps.parseGetUpNext(html));
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	getUpNext: async (videoId: string): Promise<Video|{}> => {
+		if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
+		const videoUrl = `${url}watch?v=${videoId}`;
+		const html = await request(videoUrl);
+		return ps.parseGetUpNext(html);
 	}
 
 };
