@@ -107,7 +107,7 @@ const getPlaylist = async (playlistId: string, options: Options={}): Promise<Pla
  * 
  * @param videoId Id of the video
  */
-const getVideo = async (videoId: string, options: Options): Promise<VideoDetailed|{}> => {
+const getVideo = async (videoId: string, options: Options={}): Promise<VideoDetailed|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -132,7 +132,7 @@ const getVideo = async (videoId: string, options: Options): Promise<VideoDetaile
  * @param videoId Id of the video
  * @param limit (optional) Max videos count
  */
-const getRelated = async (videoId: string, options: GetRelatedOptions): Promise<Video[]> => {
+const getRelated = async (videoId: string, options: GetRelatedOptions={}): Promise<Video[]> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -157,7 +157,7 @@ const getRelated = async (videoId: string, options: GetRelatedOptions): Promise<
  * 
  * @param videoId Id of the video
  */
-const getUpNext = async (videoId: string, options: Options): Promise<Video|{}> => {
+const getUpNext = async (videoId: string, options: Options={}): Promise<Video|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
