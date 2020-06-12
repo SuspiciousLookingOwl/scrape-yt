@@ -21,9 +21,12 @@ npm i scrape-yt
 Basic usage:
 ```js
 // ES5 
-const scrapeYt = require("scrape-yt").scrapeYt;
+const scrapeYt = require("scrape-yt");
+
 // ES6 / TypeScript
-import { scrapeYt } from "scrape-yt";
+import scrapeYt from "scrape-yt";
+// or import only necessary methods
+import { search, getVideo } from "scrape-yt"
 
 // Searches for video with keyword "Never gonna give you up" and limited to 10 videos
 (async() => {
