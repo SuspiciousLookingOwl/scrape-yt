@@ -62,7 +62,7 @@ Searches for result with given `query`.  `options` is optional and can have the 
 - `type` - Search type, can be `video`, `playlist` or `channel` (Default = `video`)
 - `limit` - The max count of the search result (Default = 10)
 - `page` - Show result on specified page (Default = 1)
-
+- `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example (video):
 ```json
@@ -116,8 +116,9 @@ Result example (channel):
 
 
 ---
-### getPlaylist(playlistId)
-Get playlist information and videos from the given `playlistId`
+### getPlaylist(playlistId, [options])
+Get playlist information and videos from the given `playlistId`. `options` is optional and can have the following keys
+- `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example:
 ```json
@@ -152,8 +153,9 @@ Result example:
 **Note**: `videos` only limited to 100
 
 ---
-### getVideo(videoId)
-Get video information of given `videoId`
+### getVideo(videoId, [options])
+Get video information of given `videoId`. `options` is optional and can have the following keys
+- `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example:
 ```json
