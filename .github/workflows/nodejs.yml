@@ -10,7 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-  run_12.x_test:
+  run_v12_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,7 +24,7 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: npm test
-  run_10.x_test:
+  run_v10_test:
       runs-on: ubuntu-latest
       strategy:
         matrix:
