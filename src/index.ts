@@ -29,7 +29,7 @@ export * from "./common/types";
  * @param html the HTML string
  * @param options Scrape options
  */
-export const scrapeWorker = (scraper: string, html: string, options: Options|SearchOptions|GetRelatedOptions): Promise<any> => {
+const scrapeWorker = (scraper: string, html: string, options: Options|SearchOptions|GetRelatedOptions): Promise<any> => {
 	return new Promise(function(resolve, reject) {
 		const worker = new Worker(__dirname + "/common/worker.js", {
 			workerData: {
