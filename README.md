@@ -7,10 +7,10 @@
 
 #### APIs:
 - [search](#searchquery-options)
-- [getPlaylist](#getplaylistplaylistid)
-- [getVideo](#getvideovideoid)
-- [getRelated](#getrelatedvideoid-limit--10)
-- [getUpNext](#getrelatedvideoid-limit--10)
+- [getPlaylist](#getplaylistplaylistid-options)
+- [getVideo](#getvideovideoid-options)
+- [getRelated](#getrelatedvideoid-options)
+- [getUpNext](#getupnextvideoid-options)
 
 ## Installation
 ```bash
