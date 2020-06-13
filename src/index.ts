@@ -29,7 +29,7 @@ export * from "./common/types";
  * @param html the HTML string
  * @param options Scrape options
  */
-const scrapeWorker = (scraper: string, html: string, options: Options|SearchOptions|GetRelatedOptions): Promise<any> => {
+export const scrapeWorker = (scraper: string, html: string, options: Options|SearchOptions|GetRelatedOptions): Promise<any> => {
 	return new Promise(function(resolve, reject) {
 		const worker = new Worker(__dirname + "/common/worker.js", {
 			workerData: {
@@ -51,7 +51,7 @@ const scrapeWorker = (scraper: string, html: string, options: Options|SearchOpti
  * @param query Search Query
  * @param options (optional) Option for search type and limit
  */
-const search = async (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
+export const search = async (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
 	if (query.trim().length === 0) throw(new Error("Query cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -82,7 +82,7 @@ const search = async (query: string, options: SearchOptions={}): Promise<(Video|
  * 
  * @param playlistId Id of the playlist
  */
-const getPlaylist = async (playlistId: string, options: Options={}): Promise<PlaylistDetailed|{}> => {
+export const getPlaylist = async (playlistId: string, options: Options={}): Promise<PlaylistDetailed|{}> => {
 	if (playlistId.trim().length === 0) throw (new Error("Playlist ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -107,7 +107,7 @@ const getPlaylist = async (playlistId: string, options: Options={}): Promise<Pla
  * 
  * @param videoId Id of the video
  */
-const getVideo = async (videoId: string, options: Options={}): Promise<VideoDetailed|{}> => {
+export const getVideo = async (videoId: string, options: Options={}): Promise<VideoDetailed|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -132,7 +132,7 @@ const getVideo = async (videoId: string, options: Options={}): Promise<VideoDeta
  * @param videoId Id of the video
  * @param limit (optional) Max videos count
  */
-const getRelated = async (videoId: string, options: GetRelatedOptions={}): Promise<Video[]> => {
+export const getRelated = async (videoId: string, options: GetRelatedOptions={}): Promise<Video[]> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -157,7 +157,7 @@ const getRelated = async (videoId: string, options: GetRelatedOptions={}): Promi
  * 
  * @param videoId Id of the video
  */
-const getUpNext = async (videoId: string, options: Options={}): Promise<Video|{}> => {
+export const getUpNext = async (videoId: string, options: Options={}): Promise<Video|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -178,14 +178,6 @@ const getUpNext = async (videoId: string, options: Options={}): Promise<Video|{}
 
 
 export default {
-	search,
-	getPlaylist,
-	getVideo,
-	getRelated,
-	getUpNext
-};
-
-export {
 	search,
 	getPlaylist,
 	getVideo,
