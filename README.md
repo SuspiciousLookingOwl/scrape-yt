@@ -185,8 +185,10 @@ Result example:
 ```
 
 ---
-### getRelated(videoId, limit = 10)
-Get videos related to given `videoId`. `limit` is optional (default is 10)
+### getRelated(videoId, [options])
+Get videos related to given `videoId`. `options` is optional and can have the following keys
+- `limit` - The max count of the search result (Default = 10)
+- `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example:
 ```json
@@ -209,8 +211,9 @@ Result example:
 ```
 
 ---
-### getUpNext(videoId)
-Get up next video of given `videoId`
+### getUpNext(videoId, [options])
+Get up next video of given `videoId`. `options` is optional and can have the following keys
+- `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example:
 ```json
