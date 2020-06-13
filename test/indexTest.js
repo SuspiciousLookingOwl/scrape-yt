@@ -128,7 +128,7 @@ describe("index", () => {
 	describe("getRelated", () => {	
 		let videos;
 		before(async () => {
-			videos = await scrape.getRelated(VIDEO_ID, 3);
+			videos = await scrape.getRelated(VIDEO_ID, {limit: 3});
 		});
 		it("related videos should be 3", () => {
 			assert.equal(videos.length, 3);

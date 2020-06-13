@@ -1,7 +1,15 @@
-export interface SearchOptions {
-    type?: "video" | "channel" | "playlist";
-    limit?: number;
-    page?: number;
+export interface Options {
+  useWorkerThread?: boolean;
+}
+
+export interface SearchOptions extends Options {
+  type?: "video" | "channel" | "playlist";
+  limit?: number;
+  page?: number;
+}
+
+export interface GetRelatedOptions extends Options {
+  limit?: number;
 }
 
 export interface Video {

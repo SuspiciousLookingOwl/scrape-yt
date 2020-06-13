@@ -10,11 +10,11 @@ on:
     branches: [ master ]
 
 jobs:
-  run_test:
+  run_v12_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [12.x]
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -24,3 +24,17 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: npm test
+  run_v10_test:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          node-version: [10.x]
+      steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build
+      - run: npm test -- --experimental-worker
