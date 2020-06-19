@@ -46,7 +46,7 @@ scrapeYt.search("Never gonna give you up", {
 Type check (see available [types](https://github.com/VincentJonathan/scrape-yt/blob/master/src/common/types.ts)):
 ```js
 
-import { scrapeYt, SearchOptions } from "scrape-yt";
+import scrapeYt, { SearchOptions } from "scrape-yt";
 
 let options: SearchOptions = {
     type: "channel",
