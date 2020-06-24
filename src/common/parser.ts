@@ -237,12 +237,25 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 		const primaryRenderer = sidebarRenderer[0].playlistSidebarPrimaryInfoRenderer;
 		const videoOwner = sidebarRenderer[1].playlistSidebarSecondaryInfoRenderer.videoOwner;
 
+		let videoCount = 0;
+		let viewCount = 0;
+		let lastUpdatedAt = "";
+
+		if(primaryRenderer.stats.length === 3) {
+			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
+			viewCount = +primaryRenderer.stats[1].simpleText.replace(/[^0-9]/g, "");
+			lastUpdatedAt = primaryRenderer.stats[2].simpleText;
+		} else if (primaryRenderer.stats.length === 2) {
+			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
+			lastUpdatedAt = primaryRenderer.stats[1].simpleText;
+		}
+
 		playlist = {
 			id: primaryRenderer.title.runs[0].navigationEndpoint.watchEndpoint.playlistId,
 			title: primaryRenderer.title.runs[0].text,
-			videoCount: +primaryRenderer.stats[primaryRenderer.stats.length-3].runs[0].text.replace(/[^0-9]/g, ""),
-			viewCount: +primaryRenderer.stats[primaryRenderer.stats.length-2].simpleText.replace(/[^0-9]/g, ""),
-			lastUpdatedAt: primaryRenderer.stats[primaryRenderer.stats.length-1].simpleText,
+			videoCount: videoCount,
+			viewCount: viewCount,
+			lastUpdatedAt: lastUpdatedAt,
 			...  videoOwner !== undefined && {
 				channel: {
 					id: videoOwner.videoOwnerRenderer.title.runs[0].navigationEndpoint.browseEndpoint.browseId,
