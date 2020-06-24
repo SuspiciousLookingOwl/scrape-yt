@@ -49,7 +49,7 @@ const scrapeWorker = (scraper: string, html: string, options: Options|SearchOpti
  * Search youtube for a list of  based on a search query.
  * 
  * @param query Search Query
- * @param options (optional) Option for search type and limit
+ * @param options Options for scraper
  */
 export const search = async (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
 	if (query.trim().length === 0) throw(new Error("Query cannot be blank"));
@@ -81,6 +81,7 @@ export const search = async (query: string, options: SearchOptions={}): Promise<
  * Search youtube for playlist information.
  * 
  * @param playlistId Id of the playlist
+ * @param options Options for scraper
  */
 export const getPlaylist = async (playlistId: string, options: Options={}): Promise<PlaylistDetailed|{}> => {
 	if (playlistId.trim().length === 0) throw (new Error("Playlist ID cannot be blank"));
@@ -106,6 +107,7 @@ export const getPlaylist = async (playlistId: string, options: Options={}): Prom
  * Search youtube for video information.
  * 
  * @param videoId Id of the video
+ * @param options Options for scraper
  */
 export const getVideo = async (videoId: string, options: Options={}): Promise<VideoDetailed|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
@@ -130,7 +132,7 @@ export const getVideo = async (videoId: string, options: Options={}): Promise<Vi
  * Search youtube for related videos based on videoId.
  * 
  * @param videoId Id of the video
- * @param limit (optional) Max videos count
+ * @param options Options for scraper
  */
 export const getRelated = async (videoId: string, options: GetRelatedOptions={}): Promise<Video[]> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
@@ -156,6 +158,7 @@ export const getRelated = async (videoId: string, options: GetRelatedOptions={})
  * Search youtube for up next video based on videoId.
  * 
  * @param videoId Id of the video
+ * @param options Options for scraper
  */
 export const getUpNext = async (videoId: string, options: Options={}): Promise<Video|{}> => {
 	if (videoId.trim().length === 0) throw(new Error("Video ID cannot be blank"));
