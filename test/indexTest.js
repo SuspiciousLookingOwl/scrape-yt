@@ -4,7 +4,7 @@ const scrape = require("../dist/index");
 
 const SEARCH_QUERY = "Never gonna give you up";
 const VIDEO_ID = "dQw4w9WgXcQ";
-const PLAYLIST_ID = "PLx65qkgCWNJIgVrndMrhsedBz1VDp0kfm";
+const PLAYLIST_ID = "PLAo4aa6NKcpjx0SVA3JzZHw2wJ3hQ4vmO";
 
 function orNull(val, type){
 	return typeof val === type || val === null;
@@ -92,18 +92,18 @@ describe("index", () => {
 	it("match getPlaylist result", async () => {
 		const playlist = await scrape.getPlaylist(PLAYLIST_ID);
 		assert.equal(playlist.id, PLAYLIST_ID);
-		assert.equal(playlist.title, "Very Important Videos");
-		assert.typeOf(playlist.videoCount, "number");
-		assert.isAbove(playlist.viewCount, 150000);
+		assert.equal(playlist.title, "Scrape Youtube Test");
+		assert.equal(playlist.videoCount, 5);
+		assert.typeOf(playlist.viewCount, "number");
 		assert.typeOf(playlist.lastUpdatedAt, "string");
 		assert.typeOf(playlist.channel.id, "string");
 		assert.typeOf(playlist.channel.name, "string");
 		assert.typeOf(playlist.channel.url, "string");
 		assert.startsWith(playlist.channel.thumbnail, "https://yt3.ggpht.com");
-		assert.equal(playlist.videos.length, 36);
-		assert.equal(playlist.videos[0].id, "0woboOZ9dmY");
-		assert.equal(playlist.videos[0].title, "Poopy-di Scoop");
-		assert.equal(playlist.videos[0].duration, 17);
+		assert.equal(playlist.videos.length, 5);
+		assert.equal(playlist.videos[0].id, "aROa_qE2FLM");
+		assert.equal(playlist.videos[0].title, "The Paper Kites - Don’t Keep Driving");
+		assert.equal(playlist.videos[0].duration, 321);
 		assert.startsWith(playlist.videos[0].thumbnail, "https://i.ytimg.com/");
 	});
 
