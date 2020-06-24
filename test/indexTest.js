@@ -155,7 +155,7 @@ describe("index", () => {
 		assert.typeOf(video.channel.id, "string");
 		assert.typeOf(video.channel.name, "string");
 		assert.typeOf(video.channel.url, "string");
-		assert.typeOf(video.uploadDate, "string");
+		assert.isTrue(orNull(video.uploadDate, "string"));
 		assert.typeOf(video.viewCount, "number");
 	});
 
