@@ -49,6 +49,7 @@ describe("index", () => {
 			assert.isTrue(equalOr(channel.id, "LinusTechTips", "UCXuqSBlHAE6Xw-yeJA0Tunw"));
 			assert.equal(channel.name, "Linus Tech Tips");
 			assert.typeOf(channel.thumbnail, "string");
+			assert.equal(channel.type, "channel");
 			assert.isAbove(channel.videoCount, 4900);
 		});
 	});
@@ -63,6 +64,7 @@ describe("index", () => {
 			assert.equal(playlist.id, "PL8mG-RkN2uTw7PhlnAr4pZZz2QubIbujH");
 			assert.equal(playlist.title, "The WAN Show Archive");
 			assert.typeOf(playlist.thumbnail, "string");
+			assert.equal(playlist.type, "playlist");
 			assert.isAbove(playlist.videoCount, 260);
 		});
 	});
@@ -85,6 +87,7 @@ describe("index", () => {
 			assert.typeOf(video.channel.name, "string");
 			assert.typeOf(video.channel.url, "string");
 			assert.typeOf(video.uploadDate, "string");
+			assert.equal(video.type, "video");
 			assert.isAbove(video.viewCount, 680000000);
 		});
 	});
