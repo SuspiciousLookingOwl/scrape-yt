@@ -3,7 +3,7 @@ export interface Options {
 }
 
 export interface SearchOptions extends Options {
-  type?: "video" | "channel" | "playlist";
+  type?: "video" | "channel" | "playlist" | "all";
   limit?: number;
   page?: number;
 }
@@ -12,8 +12,12 @@ export interface GetRelatedOptions extends Options {
   limit?: number;
 }
 
-export interface Video {
+export interface SearchResult {
   id: string;
+  type?: "video" | "channel" | "playlist";
+}
+
+export interface Video extends SearchResult {
   title: string;
   duration: number|null;
   thumbnail: string;
@@ -37,8 +41,7 @@ export interface VideoDetailed {
   tags: string[];
 }
 
-export interface Playlist {
-  id: string;
+export interface Playlist extends SearchResult {
   title: string;
   thumbnail: string;
   channel: Channel;
@@ -55,8 +58,7 @@ export interface PlaylistDetailed {
   videos: Video[];
 }
 
-export interface Channel {
-  id: string;
+export interface Channel extends SearchResult {
   name: string;
   url: string;
   thumbnail?: string;

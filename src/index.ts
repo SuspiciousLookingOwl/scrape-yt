@@ -17,7 +17,7 @@ const url = "https://www.youtube.com/";
 const searchType = {
 	video: "EgIQAQ%3D%3D",
 	playlist: "EgIQAw%3D%253D",
-	channel: "EgIQAg%3D%253D"
+	channel: "EgIQAg%3D%253D",
 };
 
 export * from "./common/types";
@@ -56,7 +56,7 @@ export const search = async (query: string, options: SearchOptions={}): Promise<
 
 	if (options === undefined) options = {};
 	options = {
-		type: "video",
+		type: "all",
 		useWorkerThread: false, 
 		limit: 10,
 		page: 1,
@@ -64,8 +64,10 @@ export const search = async (query: string, options: SearchOptions={}): Promise<
 	};
 
 	let searchUrl = url + "results?";
-	if (options.type && searchType[options.type]) searchUrl += `sp=${searchType[options.type]}&`;
-	else searchUrl += `sp=${searchType["video"]}&`; //Default type will be video
+	if (options.type && options.type !== "all") {
+		searchUrl += `sp=${searchType[options.type]}&`;
+	}
+	
 	searchUrl += `page=${options.page}&search_query=${query}`;
 		
 	const html = await request(searchUrl);

@@ -57,7 +57,8 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 					url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
 				} as Channel,
 				uploadDate: $result.find(".yt-lockup-meta-info li:first-of-type").text(),
-				viewCount: +$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, "")
+				viewCount: +$result.find(".yt-lockup-meta-info li:last-of-type").text().replace(/[^0-9]/g, ""),
+				type: "video"
 			} as Video;
 		} else if (options.type === "playlist") {
 			result = {
@@ -69,7 +70,8 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 					name: $result.find(".yt-lockup-byline a").text() || null,
 					url: "https://www.youtube.com" + $result.find(".yt-lockup-byline a").attr("href") || null,
 				} as Channel,
-				videoCount: +$result.find(".formatted-video-count-label b").text().replace(/[^0-9]/g, "")
+				videoCount: +$result.find(".formatted-video-count-label b").text().replace(/[^0-9]/g, ""),
+				type: "playlist"
 			} as Playlist;
 		} else {
 			result = {
@@ -77,7 +79,8 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 				name: $result.find(".yt-lockup-title a").text(),
 				thumbnail: `https:${$result.find(".yt-thumb-simple img").attr("data-thumb") || $result.find(".yt-thumb-simple img").attr("src")}`,
 				videoCount: +$result.find(".yt-lockup-meta-info li").text().replace(/[^0-9]/g, ""),
-				url: "https://www.youtube.com" + $result.find("a.yt-uix-tile-link").attr("href")
+				url: "https://www.youtube.com" + $result.find("a.yt-uix-tile-link").attr("href"),
+				type: "channel"
 			} as Channel;
 		}
 
@@ -111,13 +114,21 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 			} catch (err) {}
 		}
 
+		
 		for (let i = 0; i < dataInfo.length; i++) {
 			let data = dataInfo[i];
 			let result: Video|Playlist|Channel;
+			let searchType = options.type;
 
-			if (options.type === "video") {
+			if ( searchType === "all" ) {
+				if (data.videoRenderer !== undefined) searchType = "video";
+				else if (data.playlistRenderer !== undefined) searchType = "playlist";
+				else if (data.channelRenderer !== undefined) searchType = "channel";
+				else continue;
+			}
+
+			if (searchType === "video") {
 				data = data.videoRenderer;
-				if (data === undefined) continue;
 				result = {
 					id: data.videoId,
 					title: data.title.runs[0].text,
@@ -129,11 +140,11 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 						url: "https://www.youtube.com" + data.ownerText.runs[0].navigationEndpoint.browseEndpoint.canonicalBaseUrl || null,
 					} as Channel,
 					uploadDate: data.publishedTimeText ? data.publishedTimeText.simpleText : null,
-					viewCount: data.viewCountText && data.viewCountText.simpleText ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null
+					viewCount: data.viewCountText && data.viewCountText.simpleText ? +data.viewCountText.simpleText.replace(/[^0-9]/g, "") : null,
+					type: "video"
 				} as Video;
-			} else if (options.type === "playlist") {
+			} else if (searchType === "playlist") {
 				data = data.playlistRenderer;
-				if (data === undefined) continue;
 				result = {
 					id: data.playlistId,
 					title: data.title.simpleText,
@@ -144,16 +155,17 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 						url: "https://www.youtube.com" + data.shortBylineText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url,
 					} as Channel,
 					videoCount: +data.videoCount.replace(/[^0-9]/g, ""),
+					type: "playlist"
 				} as Playlist;
 			} else {
 				data = data.channelRenderer;
-				if (data === undefined) continue;
 				result = {
 					id: data.channelId,
 					name: data.title.simpleText,
 					thumbnail: `https:${data.thumbnail.thumbnails[data.thumbnail.thumbnails.length-1].url}`,
 					videoCount: data.videoCountText ? +data.videoCountText.runs[0].text.replace(/[^0-9]/g, "") : null,
-					url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl
+					url: "https://www.youtube.com" + data.navigationEndpoint.browseEndpoint.canonicalBaseUrl,
+					type: "channel"
 				} as Channel;
 			}
 
