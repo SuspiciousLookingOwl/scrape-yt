@@ -20,7 +20,7 @@ describe("index", () => {
 	describe("search video", () => {	
 		let videos;
 		before(async () => {
-			videos = await scrape.search(SEARCH_QUERY, {limit: 3});
+			videos = await scrape.search(SEARCH_QUERY, {limit: 3, type: "video"});
 		});
 		it("search result should be 3", () => {
 			assert.equal(videos.length, 3);
