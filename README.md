@@ -28,7 +28,7 @@ import scrapeYt from "scrape-yt";
 // or import only necessary methods
 import { search, getVideo } from "scrape-yt"
 
-// Searches for video with keyword "Never gonna give you up" and limited to 10 videos
+// Searches for video, playlist, or channel with keyword "Never gonna give you up" and limited to 10 search result
 (async() => {
     let videos = await scrapeYt.search("Never gonna give you up");
     console.log(videos[0]);
@@ -59,9 +59,9 @@ await scrapeYt.search("Rick astley", options);
 ## API
 ### search(query, [options])
 Searches for result with given `query`.  `options` is optional and can have the following keys
-- `type` - Search type, can be `video`, `playlist` or `channel` (Default = `video`)
-- `limit` - The max count of the search result (Default = 10)
-- `page` - Show result on specified page (Default = 1)
+- `type` - Search type, can be `all`, `video`, `playlist` or `channel` (Default = `all`)
+- `limit` - The max count of the search result (Default = `10`)
+- `page` - Show result on specified page (Default = `1`)
 - `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example (video):
@@ -78,7 +78,8 @@ Result example (video):
             "url": "https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw"
         },
         "uploadDate": "10 tahun yang lalu",
-        "viewCount": 680314160
+        "viewCount": 680314160,
+        "type": "video"
     },
     ...
 ]
@@ -95,7 +96,8 @@ Result example (playlist):
             "name": "Thomas Frank",
             "url": "https://www.youtube.com/user/electrickeye91"
         },
-        "videoCount": 37
+        "videoCount": 37,
+        "type": "playlist"
     },
     ...
 ]
@@ -108,7 +110,8 @@ Result example (channel):
         "name": "beegees",
         "thumbnail": "https://lh3.googleusercontent.com/a-/AOh14Gh8qGEFRMCi1sYKrapMiXS3pcOsejBEGK9WAGQsgA=s176-c-k-c0x00ffffff-no-rj-mo",
         "videoCount": 55,
-        "url": "https://www.youtube.com/user/beegeestv"
+        "url": "https://www.youtube.com/user/beegeestv",
+        "type": "channel"
     },
     ...
 ]
@@ -187,7 +190,7 @@ Result example:
 ---
 ### getRelated(videoId, [options])
 Get videos related to given `videoId`. `options` is optional and can have the following keys
-- `limit` - The max count of the search result (Default = 10)
+- `limit` - The max count of the search result (Default = `10`)
 - `useWorkerThread` - Whether to use worker thread for scraping or not (Default = `false`)
 
 Result example:
@@ -240,5 +243,3 @@ Result example:
 
 ## License
 [MIT](https://github.com/VincentJonathan/scrape-yt/blob/master/LICENSE)
-
-Modified from [scrape-youtube](https://github.com/DrKain/scrape-youtube)
