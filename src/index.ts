@@ -80,6 +80,7 @@ export const search = async (query: string, options: SearchOptions={}): Promise<
 	}
 };
 
+
 /**
  * Search youtube for playlist information.
  * 
@@ -114,6 +115,7 @@ export const getPlaylist = async (playlistId: string, options: Options={}): Prom
 
 };
 
+
 /**
  * Search youtube for video information.
  * 
@@ -146,6 +148,7 @@ export const getVideo = async (videoId: string, options: Options={}): Promise<Vi
 		return ps.parseGetVideo(html);
 	}
 };
+
 
 /**
  * Search youtube for related videos based on videoId.
@@ -180,6 +183,7 @@ export const getRelated = async (videoId: string, options: GetRelatedOptions={})
 		return ps.parseGetRelated(html, options.limit || 10);
 	}
 };
+
 
 /**
  * Search youtube for up next video based on videoId.
