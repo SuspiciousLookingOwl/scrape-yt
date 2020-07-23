@@ -102,8 +102,8 @@ export const getPlaylist = async (playlistId: string, options: Options={}): Prom
 	try {
 		html = await request(playlistUrl);
 	} catch(err) {
-		// Youtube returns 303 if playlist id not found
-		if (err.statusCode === 303) return [];
+		// Youtube returns 303 if playlist id is invalid
+		if (err.statusCode === 303) return {};
 		throw(err);
 	}
 
@@ -137,7 +137,7 @@ export const getVideo = async (videoId: string, options: Options={}): Promise<Vi
 	try {
 		html = await request(videoUrl);
 	} catch(err) {
-		// Youtube returns 303 if video id not found
+		// Youtube returns 303 if video id is invalid
 		if (err.statusCode === 303) return {};
 		throw(err);
 	}
@@ -172,7 +172,7 @@ export const getRelated = async (videoId: string, options: GetRelatedOptions={})
 	try {
 		html = await request(videoUrl);
 	} catch(err) {
-		// Youtube returns 303 if video id not found
+		// Youtube returns 303 if video id is invalid
 		if (err.statusCode === 303) return [];
 		throw(err);
 	}
@@ -206,7 +206,7 @@ export const getUpNext = async (videoId: string, options: Options={}): Promise<V
 	try {
 		html = await request(videoUrl);
 	} catch(err) {
-		// Youtube returns 303 if video id not found
+		// Youtube returns 303 if video id is invalid
 		if (err.statusCode === 303) return {};
 		throw(err);
 	}

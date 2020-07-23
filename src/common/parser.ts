@@ -353,7 +353,14 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 
 		return video;
 	} catch (err) { // Alternative
-		const contents = JSON.parse(html.split("window[\"ytInitialData\"] = ")[1].split(";\n")[0]).contents.twoColumnWatchNextResults.results.results.contents;
+
+		let contents;
+
+		try {
+			contents = JSON.parse(html.split("window[\"ytInitialData\"] = ")[1].split(";\n")[0]).contents.twoColumnWatchNextResults.results.results.contents;
+		} catch (err) {
+			return {}; // Video not found;
+		}
 
 		const secondaryInfo = contents[1].videoSecondaryInfoRenderer;
 		const primaryInfo = contents[0].videoPrimaryInfoRenderer;
