@@ -10,7 +10,11 @@ import {
 	SearchOptions
 } from "./types";
 
-
+/**
+ * Get duration in seconds
+ * 
+ * @param s String timestamp
+ */
 const getDuration = (s: string): number => {
 	s = s.replace(/:/g, ".");
 	const spl = s.split(".");
@@ -31,6 +35,13 @@ const getDuration = (s: string): number => {
 	}
 };
 
+
+/**
+ * Scrape search result from passed HTML
+ * 
+ * @param html HTML
+ * @param options Search options
+ */
 export function parseSearch(html: string, options: SearchOptions): (Video|Playlist|Channel)[] {
 	const results = [];
 	const $ = cheerio.load(html);
@@ -179,6 +190,12 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 	return results;
 }
 
+
+/**
+ * Scrape playlist result from passed HTML
+ * 
+ * @param html HTML
+ */
 export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 	const $ = cheerio.load(html);
 	let playlist: PlaylistDetailed;
@@ -286,6 +303,12 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 
 }
 
+
+/**
+ * Scrape video result from passed HTML
+ * 
+ * @param html HTML
+ */
 export function parseGetVideo(html: string): VideoDetailed | {} {
 	try {
 		const relatedPlayer = html.split("RELATED_PLAYER_ARGS': ")[1].split("'BG_P'")[0].split("\n")[0];
@@ -383,6 +406,12 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 	}
 }
 
+
+/**
+ * Scrape related video from a video from passed HTML
+ * 
+ * @param html HTML
+ */
 export function parseGetRelated(html: string, limit: number): Video[] {
 	let videosInfo = [];
 	let scrapped = false;
@@ -435,6 +464,12 @@ export function parseGetRelated(html: string, limit: number): Video[] {
 	return relatedVideos;
 }
 
+
+/**
+ * Scrape up next video from a video from passed HTML
+ * 
+ * @param html HTML
+ */
 export function parseGetUpNext(html: string): Video | {} {
 	let videoInfo = null;
 	let scrapped = false;
