@@ -115,6 +115,9 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 		}
 
 		
+		if (!scrapped) { return []; }
+
+		
 		for (let i = 0; i < dataInfo.length; i++) {
 			let data = dataInfo[i];
 			let result: Video|Playlist|Channel;
@@ -402,6 +405,8 @@ export function parseGetRelated(html: string, limit: number): Video[] {
 		} catch (err) {}
 	}
 
+	if (!scrapped) { return []; }
+
 	const relatedVideos: Video[] = [];
 
 	for (let i = 0; i < videosInfo.length; i++) {
@@ -452,7 +457,7 @@ export function parseGetUpNext(html: string): Video | {} {
 		} catch (err) {}
 	}
 
-	if (videoInfo === null) return {}; // Video not found
+	if (!scrapped || videoInfo === null) return {}; // Video not found
 
 	const upNext: Video = {
 		id: videoInfo.videoId,

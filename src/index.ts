@@ -22,6 +22,7 @@ const searchType = {
 
 export * from "./common/types";
 
+
 /**
  * Start worker for scrapping
  * 
@@ -95,7 +96,15 @@ export const getPlaylist = async (playlistId: string, options: Options={}): Prom
 	};
 
 	const playlistUrl = `${url}playlist?list=${playlistId}`;
-	const html = await request(playlistUrl);
+	let html = "";
+
+	try {
+		html = await request(playlistUrl);
+	} catch(err) {
+		// Youtube returns 303 if playlist id not found
+		if (err.statusCode === 303) return [];
+		throw(err);
+	}
 
 	if (options.useWorkerThread) {
 		return await scrapeWorker("getPlaylist", html, options);
@@ -121,7 +130,15 @@ export const getVideo = async (videoId: string, options: Options={}): Promise<Vi
 	};
 
 	const videoUrl = `${url}watch?v=${videoId}`;
-	const html = await request(videoUrl);
+	let html = "";
+
+	try {
+		html = await request(videoUrl);
+	} catch(err) {
+		// Youtube returns 303 if video id not found
+		if (err.statusCode === 303) return {};
+		throw(err);
+	}
 
 	if (options.useWorkerThread) {
 		return await scrapeWorker("getVideo", html, options);
@@ -147,7 +164,15 @@ export const getRelated = async (videoId: string, options: GetRelatedOptions={})
 	};
 
 	const videoUrl = `${url}watch?v=${videoId}`;
-	const html = await request(videoUrl);
+
+	let html = "";
+	try {
+		html = await request(videoUrl);
+	} catch(err) {
+		// Youtube returns 303 if video id not found
+		if (err.statusCode === 303) return [];
+		throw(err);
+	}
 
 	if (options.useWorkerThread) {
 		return await scrapeWorker("getRelated", html, options);
@@ -172,7 +197,15 @@ export const getUpNext = async (videoId: string, options: Options={}): Promise<V
 	};
 
 	const videoUrl = `${url}watch?v=${videoId}`;
-	const html = await request(videoUrl);
+	let html = "";
+
+	try {
+		html = await request(videoUrl);
+	} catch(err) {
+		// Youtube returns 303 if video id not found
+		if (err.statusCode === 303) return {};
+		throw(err);
+	}
 
 	if (options.useWorkerThread) {
 		return await scrapeWorker("getUpNext", html, options);
