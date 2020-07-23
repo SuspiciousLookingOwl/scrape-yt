@@ -143,6 +143,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 
 			if (searchType === "video") {
 				data = data.videoRenderer;
+				if (!data) continue;
 				result = {
 					id: data.videoId,
 					title: data.title.runs[0].text,
@@ -159,6 +160,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 				} as Video;
 			} else if (searchType === "playlist") {
 				data = data.playlistRenderer;
+				if (!data) continue;
 				result = {
 					id: data.playlistId,
 					title: data.title.simpleText,
@@ -173,6 +175,7 @@ export function parseSearch(html: string, options: SearchOptions): (Video|Playli
 				} as Playlist;
 			} else {
 				data = data.channelRenderer;
+				if (!data) continue;
 				result = {
 					id: data.channelId,
 					name: data.title.simpleText,
