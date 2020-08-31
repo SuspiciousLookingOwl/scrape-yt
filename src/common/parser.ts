@@ -327,9 +327,11 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			});
 		}
 
-		videoInfo.description.runs.forEach((descriptionPart: Record<string, string>) => {
-			description += descriptionPart.text;
-		});
+		if (videoInfo.description !== undefined) {
+			videoInfo.description.runs.forEach((descriptionPart: Record<string, string>) => {
+				description += descriptionPart.text;
+			});
+		}
 
 		const video = {
 			id: videoInfo.videoId,
@@ -379,9 +381,11 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 			});
 		}
 
-		videoInfo.description.runs.forEach((descriptionPart: Record<string, string>) => {
-			description += descriptionPart.text;
-		});
+		if (videoInfo.description !== undefined) {
+			videoInfo.description.runs.forEach((descriptionPart: Record<string, string>) => {
+				description += descriptionPart.text;
+			});
+		}
 
 		const video = {
 			id: videoInfo.videoDetails.videoId,
