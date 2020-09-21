@@ -64,3 +64,9 @@ export interface Channel extends SearchResult {
   thumbnail?: string;
   videoCount?: number;
 }
+
+export type SearchType<T> = 
+	T extends {type: "video"} ? Video :
+	T extends {type: "channel"} ? Channel :
+	T extends {type: "playlist"} ? Playlist :
+	Video|Channel|Playlist;

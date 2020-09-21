@@ -3,11 +3,10 @@ import bent from "bent";
 import {
 	Video,
 	VideoDetailed,
-	Playlist,
 	PlaylistDetailed,
-	Channel,
 	Options,
 	SearchOptions,
+	SearchType,
 	GetRelatedOptions,
 } from "./common/types";
 import { Worker } from "worker_threads";
@@ -18,6 +17,7 @@ const searchType = {
 	video: "EgIQAQ%3D%3D",
 	playlist: "EgIQAw%3D%253D",
 	channel: "EgIQAg%3D%253D",
+	all: ""
 };
 
 export * from "./common/types";
@@ -45,14 +45,13 @@ const scrapeWorker = (scraper: string, html: string, options: Options|SearchOpti
 	});
 };
 
-
 /**
  * Search youtube for a list of  based on a search query.
  * 
  * @param query Search Query
  * @param options Options for scraper
  */
-export const search = async (query: string, options: SearchOptions={}): Promise<(Video|Channel|Playlist)[]> => {
+export const search = async <T extends SearchOptions>(query: string, options: Partial<T> = {}): Promise<SearchType<T>[]> => {
 	if (query.trim().length === 0) throw(new Error("Query cannot be blank"));
 
 	if (options === undefined) options = {};
@@ -64,19 +63,13 @@ export const search = async (query: string, options: SearchOptions={}): Promise<
 		...options
 	};
 
-	let searchUrl = url + "results?";
-	if (options.type && options.type !== "all") {
-		searchUrl += `sp=${searchType[options.type]}&`;
-	}
-	
-	searchUrl += `page=${options.page}&search_query=${query}`;
-		
+	const searchUrl = `${url}results?sp=${searchType[options.type!]}&page=${options.page}&search_query=${query}`;	
 	const html = await request(searchUrl);
 	
 	if (options.useWorkerThread) {
 		return await scrapeWorker("search", html, options);
 	} else {
-		return ps.parseSearch(html, options);
+		return ps.parseSearch(html, options) as SearchType<T>[];
 	}
 };
 
