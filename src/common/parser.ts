@@ -254,7 +254,7 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 
 			const video = {
 				id: videoInfo.videoId,
-				title: videoInfo.title.simpleText,
+				title: videoInfo.title.runs ? videoInfo.title.runs[0].text : videoInfo.title.simpleText,
 				duration: getDuration(videoInfo.lengthText.simpleText),
 				thumbnail: videoInfo.thumbnail.thumbnails[videoInfo.thumbnail.thumbnails.length-1].url,
 				channel: {
@@ -279,7 +279,7 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 		if(primaryRenderer.stats.length === 3) {
 			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
 			viewCount = +primaryRenderer.stats[1].simpleText.replace(/[^0-9]/g, "");
-			lastUpdatedAt = primaryRenderer.stats[2].simpleText;
+			lastUpdatedAt = primaryRenderer.stats[2].runs ? primaryRenderer.stats[2].runs.join() : primaryRenderer.stats[2].simpleText;
 		} else if (primaryRenderer.stats.length === 2) {
 			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
 			lastUpdatedAt = primaryRenderer.stats[1].simpleText;
