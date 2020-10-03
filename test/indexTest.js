@@ -69,29 +69,6 @@ describe("index", () => {
 		});
 	});
 
-	describe("search video", () => {	
-		let videos;
-		before(async () => {
-			videos = await scrape.search(SEARCH_QUERY, {limit: 3});
-		});
-		it("search result should be 3", () => {
-			assert.equal(videos.length, 3);
-		});
-		it("match 1st video from search result", () => {
-			const video = videos[0];
-			assert.equal(video.id, VIDEO_ID);
-			assert.equal(video.title, "Rick Astley - Never Gonna Give You Up (Video)");
-			assert.equal(video.duration, 213);
-			assert.startsWith(video.thumbnail, "https://i.ytimg.com/");
-			assert.typeOf(video.channel.id, "string");
-			assert.typeOf(video.channel.name, "string");
-			assert.typeOf(video.channel.url, "string");
-			assert.typeOf(video.uploadDate, "string");
-			assert.equal(video.type, "video");
-			assert.isAbove(video.viewCount, 680000000);
-		});
-	});
-
 	it("match getPlaylist result", async () => {
 		const playlist = await scrape.getPlaylist(PLAYLIST_ID);
 		assert.equal(playlist.id, PLAYLIST_ID);
