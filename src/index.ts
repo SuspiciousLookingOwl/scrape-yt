@@ -9,7 +9,6 @@ import {
 	SearchType,
 	GetRelatedOptions,
 } from "./common/types";
-import { Worker } from "worker_threads";
 
 const request = bent("string");
 const url = "https://www.youtube.com/";
@@ -32,7 +31,7 @@ export * from "./common/types";
  */
 const scrapeWorker = (scraper: string, html: string, options: Options|SearchOptions|GetRelatedOptions): Promise<any> => {
 	return new Promise(function(resolve, reject) {
-		const worker = new Worker(__dirname + "/common/worker.js", {
+		const worker = new (require("worker_threads").Worker)(__dirname + "/common/worker.js", {
 			workerData: {
 				scraper: scraper,
 				html: html,
