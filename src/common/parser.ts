@@ -270,7 +270,7 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 		const sidebarRenderer = JSON.parse(html.split("{\"playlistSidebarRenderer\":")[1].split("\n")[0].slice(0, -3)).items;
 
 		const primaryRenderer = sidebarRenderer[0].playlistSidebarPrimaryInfoRenderer;
-		const videoOwner = sidebarRenderer[1].playlistSidebarSecondaryInfoRenderer.videoOwner;
+		const videoOwner = sidebarRenderer[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner ?? undefined;
 
 		let videoCount = 0;
 		let viewCount = 0;
@@ -279,7 +279,7 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 		if(primaryRenderer.stats.length === 3) {
 			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
 			viewCount = +primaryRenderer.stats[1].simpleText.replace(/[^0-9]/g, "");
-			lastUpdatedAt = primaryRenderer.stats[2].runs ? primaryRenderer.stats[2].runs.join() : primaryRenderer.stats[2].simpleText;
+			lastUpdatedAt = (primaryRenderer.stats[2].runs[1]?.text ?? primaryRenderer.stats[2].simpleText) || primaryRenderer.stats[2].runs[0].text;
 		} else if (primaryRenderer.stats.length === 2) {
 			videoCount = +primaryRenderer.stats[0]?.runs[0].text.replace(/[^0-9]/g, "");
 			lastUpdatedAt = primaryRenderer.stats[1].simpleText;
