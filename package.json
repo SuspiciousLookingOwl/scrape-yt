@@ -1,6 +1,6 @@
 {
   "name": "scrape-yt",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Simple package to scrape information from youtube such as search results, video information, related videos, and up next video",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
