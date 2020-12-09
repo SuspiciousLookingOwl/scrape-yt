@@ -266,8 +266,8 @@ export function parseGetPlaylist(html: string): PlaylistDetailed | {} {
 	
 			videos.push(video);
 		}
-				
-		const sidebarRenderer = JSON.parse(html.split("{\"playlistSidebarRenderer\":")[1].split("\n")[0].slice(0, -3)).items;
+		
+		const sidebarRenderer = JSON.parse(html.split("{\"playlistSidebarRenderer\":")[1].split("}};</script>")[0]).items;
 
 		const primaryRenderer = sidebarRenderer[0].playlistSidebarPrimaryInfoRenderer;
 		const videoOwner = sidebarRenderer[1]?.playlistSidebarSecondaryInfoRenderer.videoOwner ?? undefined;
@@ -362,14 +362,14 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 		let contents;
 
 		try {
-			contents = JSON.parse(html.split("window[\"ytInitialData\"] = ")[1].split(";\n")[0]).contents.twoColumnWatchNextResults.results.results.contents;
+			contents = JSON.parse(html.split("var ytInitialData = ")[1].split(";</script>")[0]).contents.twoColumnWatchNextResults.results.results.contents;
 		} catch (err) {
 			return {}; // Video not found;
 		}
 
 		const secondaryInfo = contents[1].videoSecondaryInfoRenderer;
 		const primaryInfo = contents[0].videoPrimaryInfoRenderer;
-		const videoDetails = JSON.parse(html.split("window[\"ytInitialPlayerResponse\"] = ")[1].split(";\n")[0]).videoDetails;
+		const videoDetails = JSON.parse(html.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0]).videoDetails;
 		const videoInfo = {...secondaryInfo, ...primaryInfo, videoDetails};
 
 		const tags: string[] = [];
