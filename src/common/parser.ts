@@ -369,7 +369,12 @@ export function parseGetVideo(html: string): VideoDetailed | {} {
 
 		const secondaryInfo = contents[1].videoSecondaryInfoRenderer;
 		const primaryInfo = contents[0].videoPrimaryInfoRenderer;
-		const videoDetails = JSON.parse(html.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0]).videoDetails;
+		let videoDetails;
+		try {
+			videoDetails = JSON.parse(html.split("var ytInitialPlayerResponse = ")[1].split(";</script>")[0]).videoDetails;
+		} catch (err) {
+			videoDetails = JSON.parse(html.split("var ytInitialPlayerResponse = ")[1].split(";var meta")[0]).videoDetails;
+		}
 		const videoInfo = {...secondaryInfo, ...primaryInfo, videoDetails};
 
 		const tags: string[] = [];
