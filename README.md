@@ -1,16 +1,31 @@
 
 
+# No more new features, only do bug fixes. 
+
+I was working for [v2](https://github.com/SuspiciousLookingOwl/scrape-yt/tree/v2) of this library but I figured that it will be better to make a new library instead because the v2 doesn't scrape data from Youtube page anymore, instead it will send a request to (what I assume to be) Youtube internal API for Youtube Web App.
+
+It's called [Youtubei](https://github.com/SuspiciousLookingOwl/youtubei), it's still in early stage but should be stable. It also should be faster than `scrape-yt`. Go check it out 😁
+
+---
+
 # scrape-yt
 [![NPM](https://nodei.co/npm/scrape-yt.png?downloads=true)](https://nodei.co/npm/scrape-yt)
 
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
 #### APIs:
-- [search](#searchquery-options)
-- [getPlaylist](#getplaylistplaylistid-options)
-- [getVideo](#getvideovideoid-options)
-- [getRelated](#getrelatedvideoid-options)
-- [getUpNext](#getupnextvideoid-options)
+- [No more new features, only do bug fixes.](#no-more-new-features-only-do-bug-fixes)
+- [scrape-yt](#scrape-yt)
+			- [APIs:](#apis)
+	- [Installation](#installation)
+	- [Usage Example](#usage-example)
+	- [API](#api)
+		- [search(query, [options])](#searchquery-options)
+		- [getPlaylist(playlistId, [options])](#getplaylistplaylistid-options)
+		- [getVideo(videoId, [options])](#getvideovideoid-options)
+		- [getRelated(videoId, [options])](#getrelatedvideoid-options)
+		- [getUpNext(videoId, [options])](#getupnextvideoid-options)
+	- [License](#license)
 
 ## Installation
 ```bash
