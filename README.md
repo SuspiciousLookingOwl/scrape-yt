@@ -1,6 +1,6 @@
 
 
-# No more new features, only do bug fixes. 
+# This package is deprecated, use Youtubei instead
 
 I was working for [v2](https://github.com/SuspiciousLookingOwl/scrape-yt/tree/v2) of this library but I figured that it will be better to make a new library instead because the v2 doesn't scrape data from Youtube page anymore, instead it will send a request to (what I assume to be) Youtube internal API for Youtube Web App.
 
@@ -14,18 +14,18 @@ It's called [Youtubei](https://github.com/SuspiciousLookingOwl/youtubei), it's s
 `scarpe-yt` is a simple package to scrape information from Youtube such as search results, video information, related videos, playlist information, and up next video
 
 #### APIs:
-- [No more new features, only do bug fixes.](#no-more-new-features-only-do-bug-fixes)
+- [This package is deprecated, use Youtubei instead](#this-package-is-deprecated-use-youtubei-instead)
 - [scrape-yt](#scrape-yt)
-			- [APIs:](#apis)
-	- [Installation](#installation)
-	- [Usage Example](#usage-example)
-	- [API](#api)
-		- [search(query, [options])](#searchquery-options)
-		- [getPlaylist(playlistId, [options])](#getplaylistplaylistid-options)
-		- [getVideo(videoId, [options])](#getvideovideoid-options)
-		- [getRelated(videoId, [options])](#getrelatedvideoid-options)
-		- [getUpNext(videoId, [options])](#getupnextvideoid-options)
-	- [License](#license)
+      - [APIs:](#apis)
+  - [Installation](#installation)
+  - [Usage Example](#usage-example)
+  - [API](#api)
+    - [search(query, [options])](#searchquery-options)
+    - [getPlaylist(playlistId, [options])](#getplaylistplaylistid-options)
+    - [getVideo(videoId, [options])](#getvideovideoid-options)
+    - [getRelated(videoId, [options])](#getrelatedvideoid-options)
+    - [getUpNext(videoId, [options])](#getupnextvideoid-options)
+  - [License](#license)
 
 ## Installation
 ```bash
